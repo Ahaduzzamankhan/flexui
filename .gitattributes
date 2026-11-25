@@ -1,0 +1,31 @@
+
+# Detect programming languages
+* linguist-detectable=true
+
+# Keep documentation from affecting language statistics
+*.md linguist-documentation=true
+*.mdx linguist-documentation=true
+
+# Exclude generated and dependency directories
+node_modules/** linguist-vendored
+dist/** linguist-generated
+build/** linguist-generated
+target/** linguist-generated
+.next/** linguist-generated
+coverage/** linguist-generated
+
+# Exclude binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.svg linguist-detectable=false
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.mp4 binary
+*.zip binary
+*.exe binary
