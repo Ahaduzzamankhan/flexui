@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FlexUI 2.0 — utility-first CSS, compiled by Go</title>
+    <meta
+      name="description"
+      content="FlexUI compiles only the utilities you use into one deterministic stylesheet. Native Go compiler, npm distribution, zero runtime."
+    />
+    <link rel="stylesheet" href="dist/flexui.css" />
+  </head>
+  <body class="bg-white text-slate-900 antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-slate-900 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+      >Skip to content</a
+    >
+
+    <header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <a href="#" class="flex items-center gap-2 text-base font-semibold tracking-tight">
+          <span
+            class="grid size-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-sky-400 text-sm font-bold text-white"
+            aria-hidden="true"
+            >F</span
+          >
+          FlexUI
+          <span class="rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-500">2.0</span>
+        </a>
+
+        <nav aria-label="Main" class="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
+          <a href="#features" class="transition hover:text-slate-900">Features</a>
+          <a href="#workflow" class="transition hover:text-slate-900">Workflow</a>
+          <a href="#pricing" class="transition hover:text-slate-900">Pricing</a>
+          <a href="#faq" class="transition hover:text-slate-900">FAQ</a>
+        </nav>
+
+        <div class="hidden items-center gap-3 md:flex">
+          <a
+            href="https://github.com/Ahaduzzamankhan/flexui"
+            class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+            >GitHub</a
+          >
+          <a
+            href="#quickstart"
+            class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+            >Get started</a
+          >
+        </div>
+
+        <details class="relative md:hidden">
+          <summary
+            class="grid size-9 cursor-pointer list-none place-items-center rounded-lg border border-slate-200 text-slate-700"
+            aria-label="Open menu"
+          >
+            <span class="text-lg leading-none" aria-hidden="true">≡</span>
+          </summary>
+          <nav
+            aria-label="Mobile"
+            class="absolute right-0 top-12 w-52 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
+          >
+            <a href="#features" class="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">Features</a>
+            <a href="#workflow" class="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">Workflow</a>
+            <a href="#pricing" class="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">Pricing</a>
+            <a href="#faq" class="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">FAQ</a>
+          </nav>
+        </details>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Hero -->
+      <section class="relative overflow-hidden">
+        <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+          <div
+            class="absolute -top-64 left-1/2 size-[42rem] -translate-x-1/2 rounded-full bg-gradient-to-br from-indigo-200 via-sky-100 to-transparent opacity-70 blur-3xl"
+          ></div>
+        </div>
+
+        <div class="mx-auto grid max-w-6xl gap-14 px-6 pt-16 pb-20 lg:grid-cols-2 lg:items-center lg:gap-16 lg:pt-24">
+          <div>
+            <p
+              class="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700"
+            >
+              <span class="size-1.5 rounded-full bg-indigo-500" aria-hidden="true"></span>
+              v2.0 alpha · compiler foundation
+            </p>
+
+            <h1 class="mt-6 type-display-xl text-balance text-slate-900">
+              Ship interfaces, not stylesheets.
+            </h1>
+
+            <p class="mt-6 max-w-xl text-lg leading-relaxed text-slate-600">
+              FlexUI scans your markup, resolves only the utilities you actually use, and writes one
+              deterministic stylesheet. A native Go compiler does the work — no runtime, no unused
+              rules, no Go install.
+            </p>
+
+            <div class="mt-8 flex flex-wrap items-center gap-3">
+              <a
+                href="#quickstart"
+                class="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >Start building</a
+              >
+              <a
+                href="#features"
+                class="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                >See the utilities</a
+              >
+            </div>
+
+            <dl class="mt-14 grid grid-cols-2 gap-6 border-t border-slate-200 pt-8 sm:grid-cols-4">
+              <div>
+                <dt class="text-xs font-medium uppercase tracking-widest text-slate-500">Binary</dt>
+                <dd class="mt-1 text-2xl font-semibold tracking-tight">~3 MB</dd>
+              </div>
+              <div>
+                <dt class="text-xs font-medium uppercase tracking-widest text-slate-500">Dependencies</dt>
+                <dd class="mt-1 text-2xl font-semibold tracking-tight">0</dd>
+              </div>
+              <div>
+                <dt class="text-xs font-medium uppercase tracking-widest text-slate-500">Runtime JS</dt>
+                <dd class="mt-1 text-2xl font-semibold tracking-tight">None</dd>
+              </div>
+              <div>
+                <dt class="text-xs font-medium uppercase tracking-widest text-slate-500">Platforms</dt>
+                <dd class="mt-1 text-2xl font-semibold tracking-tight">6</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="relative">
+            <div class="rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
+              <div class="flex items-center gap-2 border-b border-slate-800 px-4 py-3">
+                <span class="size-2.5 rounded-full bg-rose-400" aria-hidden="true"></span>
+                <span class="size-2.5 rounded-full bg-amber-400" aria-hidden="true"></span>
+                <span class="size-2.5 rounded-full bg-emerald-400" aria-hidden="true"></span>
+                <span class="ml-2 font-mono text-xs text-slate-500">packages/ui/hero.tsx</span>
+              </div>
+              <pre class="overflow-x-auto p-5 font-mono text-xs leading-relaxed text-slate-300"><code><span class="text-slate-500">&lt;section</span> <span class="text-sky-300">class</span>=<span class="text-emerald-300">"mx-auto max-w-6xl px-6 py-24"</span><span class="text-slate-500">&gt;</span>
+  <span class="text-slate-500">&lt;h1</span> <span class="text-sky-300">class</span>=<span class="text-emerald-300">"type-display-xl text-balance"</span><span class="text-slate-500">&gt;</span>
+    Ship interfaces, not stylesheets.
+  <span class="text-slate-500">&lt;/h1&gt;</span>
+  <span class="text-slate-500">&lt;div</span> <span class="text-sky-300">class</span>=<span class="text-emerald-300">"mt-8 grid gap-4 md:grid-cols-3"</span><span class="text-slate-500">&gt;</span>
+    <span class="text-slate-500">&lt;article</span> <span class="text-sky-300">class</span>=<span class="text-emerald-300">"rounded-2xl border p-6 hover:-translate-y-1"</span><span class="text-slate-500">&gt;</span>
+      …
+    <span class="text-slate-500">&lt;/article&gt;</span>
+  <span class="text-slate-500">&lt;/div&gt;</span>
+<span class="text-slate-500">&lt;/section&gt;</span></code></pre>
+            </div>
+
+            <div class="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div class="flex items-center justify-between">
+                <p class="font-mono text-xs text-slate-500">$ npx flexui build --minify</p>
+                <span class="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">ok</span>
+              </div>
+              <div class="mt-3 space-y-2 font-mono text-xs text-slate-600">
+                <p class="flex items-center justify-between"><span>files scanned</span><span class="text-slate-900">128</span></p>
+                <p class="flex items-center justify-between"><span>candidates</span><span class="text-slate-900">1 842</span></p>
+                <p class="flex items-center justify-between"><span>rules emitted</span><span class="text-slate-900">412</span></p>
+                <p class="flex items-center justify-between font-semibold text-slate-900"><span>dist/flexui.css</span><span>21.4 kB</span></p>
+              </div>
+              <div class="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                <div class="h-full w-1/3 rounded-full bg-indigo-500"></div>
+              </div>
+              <p class="mt-2 text-xs text-slate-500">Cached · 38 ms warm rebuild</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stack strip -->
+      <section class="border-y border-slate-200 bg-slate-50/70">
+        <div
+          class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-6 text-sm text-slate-500 sm:flex-row"
+        >
+          <p class="font-medium">Works with the stack you already have</p>
+          <ul class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-medium text-slate-600">
+            <li>HTML</li>
+            <li>React</li>
+            <li>Vue</li>
+            <li>Svelte</li>
+            <li>Astro</li>
+            <li>Vite</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section id="features" class="mx-auto max-w-6xl px-6 py-20">
+        <div class="max-w-2xl">
+          <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600">The engine</p>
+          <h2 class="mt-3 type-heading text-slate-900">A compiler, not a big stylesheet.</h2>
+          <p class="mt-4 text-base leading-relaxed text-slate-600">
+            Every class you write becomes a resolved rule with a stable position in the cascade.
+            Nothing ships that your markup does not use.
+          </p>
+        </div>
+
+        <div class="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <article
+            class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition motion-reduce:transition-none hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div
+              class="mb-5 grid size-10 place-items-center rounded-xl bg-indigo-50 text-indigo-600 transition group-hover:scale-110 motion-reduce:transition-none"
+              aria-hidden="true"
+            >
+              ⚡
+            </div>
+            <h3 class="text-base font-semibold tracking-tight">Native Go compiler</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+              One static binary, six platforms, zero dependencies. Cold builds are measured in
+              milliseconds because there is no JavaScript toolchain in the way.
+            </p>
+          </article>
+
+          <article
+            class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition motion-reduce:transition-none hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div
+              class="mb-5 grid size-10 place-items-center rounded-xl bg-emerald-50 text-emerald-600 transition group-hover:scale-110 motion-reduce:transition-none"
+              aria-hidden="true"
+            >
+              ◈
+            </div>
+            <h3 class="text-base font-semibold tracking-tight">Deterministic output</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+              Rules sort by context, utility order and variant rank. The same source always produces
+              the same bytes — reviewable diffs, reproducible builds.
+            </p>
+          </article>
+
+          <article
+            class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition motion-reduce:transition-none hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div
+              class="mb-5 grid size-10 place-items-center rounded-xl bg-sky-50 text-sky-600 transition group-hover:scale-110 motion-reduce:transition-none"
+              aria-hidden="true"
+            >
+              ◎
+            </div>
+            <h3 class="text-base font-semibold tracking-tight">Variants that compose</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+              Responsive, state, structural, group, peer, dark, data, ARIA, supports, arbitrary
+              selectors and container queries — nested in any order.
+            </p>
+          </article>
+
+          <article
+            class="group rounded-2xl border border-slate-200 bg-slate-900 p-6 text-white shadow-sm transition motion-reduce:transition-none hover:-translate-y-1 hover:shadow-lg lg:col-span-2"
+          >
+            <div class="flex h-full flex-col justify-between gap-6 md:flex-row md:items-end">
+              <div>
+                <div
+                  class="mb-5 grid size-10 place-items-center rounded-xl bg-white/10 text-white"
+                  aria-hidden="true"
+                >
+                  ⌘
+                </div>
+                <h3 class="text-base font-semibold tracking-tight">Arbitrary values, when a token is not enough</h3>
+                <p class="mt-2 max-w-md text-sm leading-relaxed text-slate-300">
+                  Brackets escape the scale without escaping CSS: any length, colour, gradient,
+                  grid template or custom property.
+                </p>
+              </div>
+              <div class="rounded-xl border border-white/10 bg-black/30 p-4 font-mono text-xs text-sky-200">
+                <p>w-[350px]</p>
+                <p class="mt-1">h-[calc(100vh-80px)]</p>
+                <p class="mt-1">grid-cols-[250px_1fr]</p>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition motion-reduce:transition-none hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div
+              class="mb-5 grid size-10 place-items-center rounded-xl bg-amber-50 text-amber-600 transition group-hover:scale-110 motion-reduce:transition-none"
+              aria-hidden="true"
+            >
+              ✦
+            </div>
+            <h3 class="text-base font-semibold tracking-tight">Typography system</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+              A fluid type scale with semantic classes such as
+              <code class="rounded bg-slate-100 px-1 py-0.5 font-mono text-xs">type-heading</code>.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Workflow -->
+      <section id="workflow" class="border-y border-slate-200 bg-slate-50">
+        <div class="mx-auto max-w-6xl px-6 py-20">
+          <div class="grid gap-12 lg:grid-cols-2 lg:items-start">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600">Workflow</p>
+              <h2 class="mt-3 type-heading text-slate-900">Three commands, then write markup.</h2>
+              <ol class="mt-8 space-y-6">
+                <li class="flex gap-4">
+                  <span
+                    class="grid size-8 shrink-0 place-items-center rounded-full bg-slate-900 text-sm font-semibold text-white"
+                    >1</span
+                  >
+                  <div>
+                    <p class="font-semibold">Install</p>
+                    <p class="mt-1 text-sm text-slate-600">
+                      <code class="rounded bg-white px-1.5 py-0.5 font-mono text-xs">npm install flexui</code>
+                      — npm picks the binary for your platform.
+                    </p>
+                  </div>
+                </li>
+                <li class="flex gap-4">
+                  <span
+                    class="grid size-8 shrink-0 place-items-center rounded-full bg-slate-900 text-sm font-semibold text-white"
+                    >2</span
+                  >
+                  <div>
+                    <p class="font-semibold">Initialise</p>
+                    <p class="mt-1 text-sm text-slate-600">
+                      <code class="rounded bg-white px-1.5 py-0.5 font-mono text-xs">npx flexui init</code>
+                      writes a config and an entry stylesheet. Nothing is overwritten.
+                    </p>
+                  </div>
+                </li>
+                <li class="flex gap-4">
+                  <span
+                    class="grid size-8 shrink-0 place-items-center rounded-full bg-slate-900 text-sm font-semibold text-white"
+                    >3</span
+                  >
+                  <div>
+                    <p class="font-semibold">Build</p>
+                    <p class="mt-1 text-sm text-slate-600">
+                      <code class="rounded bg-white px-1.5 py-0.5 font-mono text-xs">npx flexui watch</code>
+                      rebuilds on change; ship with <code class="rounded bg-white px-1.5 py-0.5 font-mono text-xs">--minify</code>.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+
+            <div id="quickstart" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-500">Output</h3>
+                <span class="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs text-slate-500">flexui.css</span>
+              </div>
+              <pre class="mt-4 overflow-x-auto rounded-xl bg-slate-950 p-4 font-mono text-xs leading-relaxed text-slate-300"><code><span class="text-slate-500">@layer</span> flexui.base, flexui.utilities;
+
+<span class="text-slate-500">@layer</span> flexui.utilities {
+  .mx-auto { margin-inline: auto; }
+  .px-6 { padding-inline: 1.5rem; }
+
+  <span class="text-slate-500">@media</span> (min-width: 768px) {
+    .md\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}</code></pre>
+              <p class="mt-4 text-sm leading-relaxed text-slate-600">
+                Utilities live in a cascade layer, so your own CSS always wins without specificity
+                games.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pricing -->
+      <section id="pricing" class="mx-auto max-w-6xl px-6 py-20">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600">Pricing</p>
+          <h2 class="mt-3 type-heading text-slate-900">Free, open source, MIT.</h2>
+          <p class="mt-4 text-base leading-relaxed text-slate-600">
+            The compiler and the utilities are MIT licensed. The plans below are illustrative of how
+            a team tier would work; nothing is billed from this page.
+          </p>
+        </div>
+
+        <div class="mt-12 grid gap-6 lg:grid-cols-3">
+          <article class="flex flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+            <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-500">Solo</h3>
+            <p class="mt-4 flex items-baseline gap-1">
+              <span class="text-4xl font-semibold tracking-tight">$0</span>
+              <span class="text-sm text-slate-500">forever</span>
+            </p>
+            <p class="mt-3 text-sm text-slate-600">Everything in the compiler, for one developer.</p>
+            <ul class="mt-6 space-y-3 text-sm text-slate-700">
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-600" aria-hidden="true">✓</span> Full utility engine</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-600" aria-hidden="true">✓</span> Watch mode and cache</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-600" aria-hidden="true">✓</span> All six platforms</li>
+            </ul>
+            <a
+              href="#quickstart"
+              class="mt-8 rounded-xl border border-slate-300 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >Install</a
+            >
+          </article>
+
+          <article class="relative flex flex-col rounded-2xl border border-indigo-600 bg-white p-7 shadow-md ring-2 ring-indigo-600">
+            <span
+              class="absolute -top-3 left-7 rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white"
+              >Most popular</span
+            >
+            <h3 class="text-sm font-semibold uppercase tracking-widest text-indigo-600">Team</h3>
+            <p class="mt-4 flex items-baseline gap-1">
+              <span class="text-4xl font-semibold tracking-tight">$12</span>
+              <span class="text-sm text-slate-500">/ dev / month</span>
+            </p>
+            <p class="mt-3 text-sm text-slate-600">Shared design tokens and review workflows.</p>
+            <ul class="mt-6 space-y-3 text-sm text-slate-700">
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-600" aria-hidden="true">✓</span> Everything in Solo</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-600" aria-hidden="true">✓</span> Theme configuration (Phase 4)</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-600" aria-hidden="true">✓</span> Priority issue triage</li>
+            </ul>
+            <a
+              href="#quickstart"
+              class="mt-8 rounded-xl bg-indigo-600 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-indigo-500"
+              >Join the alpha</a
+            >
+          </article>
+
+          <article class="flex flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+            <h3 class="text-sm font-semibold uppercase tracking-widest text-slate-500">Organisation</h3>
+            <p class="mt-4 flex items-baseline gap-1">
+              <span class="text-4xl font-semibold tracking-tight">Talk</span>
+            </p>
+            <p class="mt-3 text-sm text-slate-600">Self-hosted binaries and support terms.</p>
+            <ul class="mt-6 space-y-3 text-sm text-slate-700">
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-600" aria-hidden="true">✓</span> Everything in Team</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-600" aria-hidden="true">✓</span> Internal registry mirror</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-600" aria-hidden="true">✓</span> Migration review</li>
+            </ul>
+            <a
+              href="#faq"
+              class="mt-8 rounded-xl border border-slate-300 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >Contact</a
+            >
+          </article>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section id="faq" class="border-t border-slate-200 bg-slate-50">
+        <div class="mx-auto max-w-3xl px-6 py-20">
+          <h2 class="type-heading text-slate-900">Questions</h2>
+          <div class="mt-8 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+            <details class="group p-5">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
+                Do I need Go installed?
+                <span class="text-slate-400 transition group-open:rotate-45 motion-reduce:transition-none" aria-hidden="true">+</span>
+              </summary>
+              <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                No. The compiler is cross-compiled for Windows, Linux and macOS and installed by npm
+                as a platform package. Go is only needed if you want to build FlexUI from source.
+              </p>
+            </details>
+            <details class="group p-5">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
+                Does it work without JavaScript?
+                <span class="text-slate-400 transition group-open:rotate-45 motion-reduce:transition-none" aria-hidden="true">+</span>
+              </summary>
+              <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                Yes. Styling is plain CSS. The optional runtime that will power dialogs and menus is a
+                separate, tree-shakeable module and is not required for utilities.
+              </p>
+            </details>
+            <details class="group p-5">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
+                How big is the generated CSS?
+                <span class="text-slate-400 transition group-open:rotate-45 motion-reduce:transition-none" aria-hidden="true">+</span>
+              </summary>
+              <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                Only rules your sources reference are emitted, plus the preflight reset you opt into.
+                A stylesheet for this page — 400-odd classes, responsive variants included — is around
+                twenty kilobytes uncompressed.
+              </p>
+            </details>
+            <details class="group p-5">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
+                Can I use my own design tokens?
+                <span class="text-slate-400 transition group-open:rotate-45 motion-reduce:transition-none" aria-hidden="true">+</span>
+              </summary>
+              <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                Theme configuration is the next milestone. Today the built-in scales cover spacing,
+                colour, type, radius, shadow, breakpoints and easing, and arbitrary values cover the
+                gaps.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="mx-auto max-w-6xl px-6 py-20">
+        <div class="relative overflow-hidden rounded-3xl bg-slate-900 px-8 py-14 text-center">
+          <div
+            class="pointer-events-none absolute inset-0 opacity-60"
+            aria-hidden="true"
+          >
+            <div class="absolute -top-24 left-1/4 size-80 rounded-full bg-indigo-500/40 blur-3xl"></div>
+            <div class="absolute -bottom-24 right-1/4 size-80 rounded-full bg-sky-400/30 blur-3xl"></div>
+          </div>
+          <div class="relative">
+            <h2 class="type-display max-w-2xl mx-auto text-balance text-white">
+              Stop writing the same CSS twice.
+            </h2>
+            <p class="mx-auto mt-4 max-w-xl text-base text-slate-300">
+              One binary, one config file and a build measured in milliseconds.
+            </p>
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <a
+                href="#quickstart"
+                class="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-100"
+                >npm install flexui</a
+              >
+              <a
+                href="https://github.com/Ahaduzzamankhan/flexui"
+                class="rounded-xl border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                >Read the source</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200">
+      <div class="mx-auto grid max-w-6xl gap-8 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <p class="flex items-center gap-2 font-semibold tracking-tight">
+            <span
+              class="grid size-7 place-items-center rounded-md bg-gradient-to-br from-indigo-500 to-sky-400 text-xs font-bold text-white"
+              aria-hidden="true"
+              >F</span
+            >
+            FlexUI
+          </p>
+          <p class="mt-3 text-sm text-slate-600">
+            Utility-first CSS with a native compiler. MIT licensed.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500">Product</h3>
+          <ul class="mt-3 space-y-2 text-sm text-slate-600">
+            <li><a href="#features" class="transition hover:text-slate-900">Features</a></li>
+            <li><a href="#pricing" class="transition hover:text-slate-900">Pricing</a></li>
+            <li><a href="#faq" class="transition hover:text-slate-900">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500">Docs</h3>
+          <ul class="mt-3 space-y-2 text-sm text-slate-600">
+            <li><a href="../../docs/getting-started.md" class="transition hover:text-slate-900">Getting started</a></li>
+            <li><a href="../../docs/utilities.md" class="transition hover:text-slate-900">Utilities</a></li>
+            <li><a href="../../docs/variants.md" class="transition hover:text-slate-900">Variants</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-500">Project</h3>
+          <ul class="mt-3 space-y-2 text-sm text-slate-600">
+            <li><a href="../../docs/architecture.md" class="transition hover:text-slate-900">Architecture</a></li>
+            <li><a href="../../docs/roadmap.md" class="transition hover:text-slate-900">Roadmap</a></li>
+            <li><a href="https://github.com/Ahaduzzamankhan/flexui" class="transition hover:text-slate-900">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-slate-200">
+        <div
+          class="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p>© 2026 FlexUI contributors. Built with FlexUI.</p>
+          <p class="font-mono">github.com/Ahaduzzamankhan/flexui</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

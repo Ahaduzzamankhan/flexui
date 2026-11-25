@@ -1,0 +1,15 @@
+{
+  "name": "@flexui/cli-win32-arm64",
+  "version": "2.0.0-alpha.1",
+  "description": "FlexUI 2.0 compiler binary for Windows ARM64",
+  "license": "MIT",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "files": [
+    "flexui.exe"
+  ]
+}

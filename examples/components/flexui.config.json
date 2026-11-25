@@ -1,0 +1,9 @@
+{
+  "content": ["./index.html", "./src/**/*.ts"],
+  "input": "src/styles.css",
+  "output": "dist/flexui.css",
+  "minify": false,
+  "safelist": [
+    "fui-toast-region fui-toast fui-toast--info fui-toast--success fui-toast--danger fui-toast-content fui-toast-title fui-toast-description fui-toast-close"
+  ]
+}

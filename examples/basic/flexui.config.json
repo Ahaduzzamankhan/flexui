@@ -1,0 +1,11 @@
+{
+  "content": [
+    "./index.html"
+  ],
+  "output": "dist/flexui.css",
+  "input": "src/styles.css",
+  "minify": false,
+  "safelist": [
+    "dark:bg-slate-950"
+  ]
+}

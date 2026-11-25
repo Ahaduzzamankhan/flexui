@@ -1,0 +1,77 @@
+{
+  "name": "@flexui/runtime",
+  "version": "2.0.0-alpha.1",
+  "description": "Optional zero-dependency browser runtime for FlexUI components",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./dialog": {
+      "types": "./dist/dialog.d.ts",
+      "import": "./dist/dialog.js",
+      "default": "./dist/dialog.js"
+    },
+    "./drawer": {
+      "types": "./dist/drawer.d.ts",
+      "import": "./dist/drawer.js",
+      "default": "./dist/drawer.js"
+    },
+    "./dropdown": {
+      "types": "./dist/dropdown.d.ts",
+      "import": "./dist/dropdown.js",
+      "default": "./dist/dropdown.js"
+    },
+    "./popover": {
+      "types": "./dist/popover.d.ts",
+      "import": "./dist/popover.js",
+      "default": "./dist/popover.js"
+    },
+    "./tabs": {
+      "types": "./dist/tabs.d.ts",
+      "import": "./dist/tabs.js",
+      "default": "./dist/tabs.js"
+    },
+    "./toast": {
+      "types": "./dist/toast.d.ts",
+      "import": "./dist/toast.js",
+      "default": "./dist/toast.js"
+    },
+    "./command": {
+      "types": "./dist/command.d.ts",
+      "import": "./dist/command.js",
+      "default": "./dist/command.js"
+    },
+    "./theme": {
+      "types": "./dist/theme.d.ts",
+      "import": "./dist/theme.js",
+      "default": "./dist/theme.js"
+    },
+    "./focus": {
+      "types": "./dist/focus.d.ts",
+      "import": "./dist/focus.js",
+      "default": "./dist/focus.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [
+    "flexui",
+    "ui",
+    "runtime",
+    "dialog",
+    "accessibility"
+  ]
+}

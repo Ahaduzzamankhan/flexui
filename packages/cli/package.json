@@ -1,0 +1,51 @@
+{
+  "name": "flexui",
+  "version": "2.0.0-alpha.1",
+  "description": "FlexUI 2.0 - a utility-first CSS compiler written in Go, distributed as precompiled native binaries",
+  "license": "MIT",
+  "homepage": "https://github.com/Ahaduzzamankhan/flexui",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ahaduzzamankhan/flexui.git"
+  },
+  "keywords": [
+    "css",
+    "utility-first",
+    "tailwind-alternative",
+    "compiler",
+    "go"
+  ],
+  "bin": {
+    "flexui": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "checksums.json",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepare": "tsc -p tsconfig.json"
+  },
+  "optionalDependencies": {
+    "@flexui/cli-win32-x64": "2.0.0-alpha.1",
+    "@flexui/cli-win32-arm64": "2.0.0-alpha.1",
+    "@flexui/cli-linux-x64": "2.0.0-alpha.1",
+    "@flexui/cli-linux-arm64": "2.0.0-alpha.1",
+    "@flexui/cli-darwin-x64": "2.0.0-alpha.1",
+    "@flexui/cli-darwin-arm64": "2.0.0-alpha.1"
+  }
+}

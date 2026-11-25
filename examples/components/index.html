@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FlexUI Component Lab - runtime, dialogs, tabs, toasts</title>
+    <meta
+      name="description"
+      content="A complete FlexUI component example: accessible dialogs, drawers, dropdowns, popovers, tabs, toasts, a command palette and persistent theme switching."
+    />
+    <script>
+      // Apply the saved theme before first paint to avoid a light flash.
+      (function () {
+        try {
+          var mode = localStorage.getItem("flexui-theme") || "system";
+          var dark =
+            mode === "dark" ||
+            (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", dark);
+          document.documentElement.dataset.fuiThemeMode = mode;
+          document.documentElement.style.colorScheme = mode === "system" ? "light dark" : mode;
+        } catch (error) {
+          /* storage can be unavailable in private mode */
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="dist/flexui.css" />
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-slate-900 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+      >Skip to content</a
+    >
+
+    <header
+      class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80"
+    >
+      <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-3">
+        <a href="#" class="flex items-center gap-2 text-sm font-semibold tracking-tight">
+          <span
+            class="grid size-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-sky-400 text-sm font-bold text-white"
+            aria-hidden="true"
+            >F</span
+          >
+          FlexUI
+          <span class="rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+            >Component Lab</span
+          >
+        </a>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <div
+            class="flex items-center rounded-xl border border-slate-200 p-0.5 dark:border-slate-800"
+            role="group"
+            aria-label="Colour theme"
+          >
+            <button type="button" class="fui-btn fui-btn--ghost fui-btn--sm" data-fui-theme-set="light" aria-pressed="false">
+              Light
+            </button>
+            <button type="button" class="fui-btn fui-btn--ghost fui-btn--sm" data-fui-theme-set="dark" aria-pressed="false">
+              Dark
+            </button>
+            <button type="button" class="fui-btn fui-btn--ghost fui-btn--sm" data-fui-theme-set="system" aria-pressed="false">
+              System
+            </button>
+          </div>
+
+          <button type="button" class="fui-btn fui-btn--outline fui-btn--sm" data-fui-command-open="#command-palette">
+            <span aria-hidden="true">⌘</span>K Command
+          </button>
+
+          <a
+            class="fui-btn fui-btn--ghost fui-btn--sm"
+            href="https://github.com/Ahaduzzamankhan/flexui"
+            target="_blank"
+            rel="noreferrer"
+            >GitHub</a
+          >
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="mx-auto max-w-6xl px-6 pb-16 pt-12">
+      <section class="grid gap-6 lg:grid-cols-3">
+        <div class="lg:col-span-2">
+          <span class="fui-badge fui-badge--accent">Phase 7 · optional runtime</span>
+          <h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">Components that behave.</h1>
+          <p class="mt-4 max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-300">
+            Native <code class="font-mono text-sm">&lt;dialog&gt;</code>, the popover API, ARIA tabs and a
+            zero-dependency TypeScript runtime. Everything on this page works with the keyboard, restores focus,
+            respects reduced motion, and ships as one small optional module.
+          </p>
+
+          <div class="mt-6 flex flex-wrap gap-2">
+            <button type="button" class="fui-btn fui-btn--primary" data-fui-open="#demo-dialog">
+              Open dialog
+            </button>
+            <button type="button" class="fui-btn fui-btn--outline" data-fui-open="#settings-drawer">
+              Open drawer
+            </button>
+            <button type="button" class="fui-btn fui-btn--outline" data-fui-command-open="#command-palette">
+              Command palette
+            </button>
+            <button type="button" class="fui-btn fui-btn--ghost" data-toast-demo="success">Send a toast</button>
+          </div>
+
+          <p class="mt-4 text-xs text-slate-500 dark:text-slate-400">
+            Theme is stored in <code class="font-mono">localStorage</code> and applied before paint. Current mode:
+            <span class="font-mono text-slate-700 dark:text-slate-300" data-theme-status>system</span>.
+          </p>
+        </div>
+
+        <aside class="fui-card">
+          <div class="fui-card-header">
+            <h2 class="fui-card-title">Runtime event log</h2>
+            <button type="button" class="fui-btn fui-btn--ghost fui-btn--sm" data-clear-log>Clear</button>
+          </div>
+          <div class="fui-card-body">
+            <ol class="fui-log" data-event-log aria-live="polite" aria-label="Recent runtime events">
+              <li class="fui-log-item">
+                <time class="fui-log-time">--:--:--</time>
+                <span>Waiting for interaction…</span>
+              </li>
+            </ol>
+          </div>
+        </aside>
+      </section>
+
+      <section class="mt-10 grid gap-6 lg:grid-cols-2">
+        <article id="tabs-card" class="fui-card scroll-mt-24">
+          <div class="fui-card-header">
+            <h2 class="fui-card-title">Tabs</h2>
+            <span class="fui-badge">Arrow keys + Home/End</span>
+          </div>
+          <div class="fui-card-body">
+            <div class="fui-tabs" data-fui-tabs>
+              <div class="fui-tablist" role="tablist" aria-label="Runtime details">
+                <button
+                  type="button"
+                  class="fui-tab"
+                  role="tab"
+                  id="tab-behaviour"
+                  aria-controls="panel-behaviour"
+                  aria-selected="true"
+                >
+                  Behaviour
+                </button>
+                <button
+                  type="button"
+                  class="fui-tab"
+                  role="tab"
+                  id="tab-markup"
+                  aria-controls="panel-markup"
+                  aria-selected="false"
+                  tabindex="-1"
+                >
+                  Markup
+                </button>
+                <button
+                  type="button"
+                  class="fui-tab"
+                  role="tab"
+                  id="tab-accessibility"
+                  aria-controls="panel-accessibility"
+                  aria-selected="false"
+                  tabindex="-1"
+                >
+                  Accessibility
+                </button>
+              </div>
+
+              <div
+                class="fui-tabpanel"
+                role="tabpanel"
+                id="panel-behaviour"
+                aria-labelledby="tab-behaviour"
+                tabindex="0"
+              >
+                Click or focus a tab and use <kbd>←</kbd> <kbd>→</kbd>, <kbd>Home</kbd> and <kbd>End</kbd>. The
+                runtime keeps one tab in the tab order, updates <code>aria-selected</code> and hides inactive panels.
+              </div>
+              <div
+                class="fui-tabpanel"
+                role="tabpanel"
+                id="panel-markup"
+                aria-labelledby="tab-markup"
+                tabindex="0"
+                hidden
+              >
+                Declare the tablist with <code>data-fui-tabs</code> and standard <code>role="tab"</code> /
+                <code>role="tabpanel"</code> elements. No generated CSS or custom element is required.
+              </div>
+              <div
+                class="fui-tabpanel"
+                role="tabpanel"
+                id="panel-accessibility"
+                aria-labelledby="tab-accessibility"
+                tabindex="0"
+                hidden
+              >
+                Each panel is linked with <code>aria-controls</code> and labelled by its tab. Activation is automatic
+                on focus, so keyboard users never need a second key press.
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="fui-card">
+          <div class="fui-card-header">
+            <h2 class="fui-card-title">Dropdown &amp; popover</h2>
+            <span class="fui-badge">Native popover</span>
+          </div>
+          <div class="fui-card-body">
+            <div class="flex flex-wrap items-start gap-3">
+              <div class="relative">
+                <button
+                  type="button"
+                  class="fui-btn fui-btn--outline"
+                  data-fui-dropdown="#account-menu"
+                  aria-haspopup="menu"
+                >
+                  Account menu
+                  <span aria-hidden="true">▾</span>
+                </button>
+                <div
+                  id="account-menu"
+                  class="fui-menu absolute right-0 top-full z-20 mt-2 w-56"
+                  role="menu"
+                  aria-label="Account"
+                  hidden
+                >
+                  <p class="fui-menu-label">Signed in</p>
+                  <button type="button" class="fui-menu-item" role="menuitem">Profile</button>
+                  <button type="button" class="fui-menu-item" role="menuitem">Team settings</button>
+                  <hr class="fui-menu-sep" />
+                  <button type="button" class="fui-menu-item" role="menuitem" data-fui-open="#settings-drawer">
+                    Open preferences
+                  </button>
+                  <button type="button" class="fui-menu-item" role="menuitem" aria-disabled="true">
+                    Billing (admin only)
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="fui-btn fui-btn--outline"
+                data-fui-popover="#shipping-popover"
+                aria-haspopup="dialog"
+              >
+                Shipping details
+              </button>
+              <div id="shipping-popover" class="fui-popover" popover>
+                <p class="font-semibold text-slate-900 dark:text-slate-100">Free shipping</p>
+                <p class="mt-1 leading-relaxed">
+                  Orders over $50 ship free in 2–4 business days. The runtime positions the popover, closes it on
+                  Escape or an outside click, and keeps <code>aria-expanded</code> in sync.
+                </p>
+                <button type="button" class="fui-btn fui-btn--secondary fui-btn--sm mt-3" data-fui-popover-close>
+                  Got it
+                </button>
+              </div>
+            </div>
+
+            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">
+              Trigger with <code class="font-mono text-xs">data-fui-dropdown</code> or
+              <code class="font-mono text-xs">data-fui-popover</code>, pointing at a target element.
+            </p>
+          </div>
+        </article>
+
+        <article class="fui-card">
+          <div class="fui-card-header">
+            <h2 class="fui-card-title">Toasts</h2>
+            <span class="fui-badge">Pause on hover</span>
+          </div>
+          <div class="fui-card-body">
+            <p class="text-sm text-slate-600 dark:text-slate-300">
+              Toasts enter a polite live region, keep four at most, and pause their dismissal timer while hovered or
+              focused.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button type="button" class="fui-btn fui-btn--secondary fui-btn--sm" data-toast-demo="info">
+                Info toast
+              </button>
+              <button type="button" class="fui-btn fui-btn--secondary fui-btn--sm" data-toast-demo="success">
+                Success toast
+              </button>
+              <button type="button" class="fui-btn fui-btn--danger fui-btn--sm" data-toast-demo="danger">
+                Danger toast
+              </button>
+              <button type="button" class="fui-btn fui-btn--ghost fui-btn--sm" data-toast-demo="sticky">
+                Sticky toast
+              </button>
+            </div>
+
+            <pre
+              class="mt-4 overflow-x-auto rounded-xl bg-slate-950 p-4 font-mono text-xs leading-relaxed text-slate-200"
+            ><code>toast({
+  variant: "success",
+  title: "Workspace created",
+  description: "The new workspace is ready."
+});</code></pre>
+          </div>
+        </article>
+
+        <article class="fui-card">
+          <div class="fui-card-header">
+            <h2 class="fui-card-title">Focus &amp; keyboard map</h2>
+            <span class="fui-badge fui-badge--success">A11y</span>
+          </div>
+          <div class="fui-card-body">
+            <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+              <li><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> stay inside open modal dialogs.</li>
+              <li><kbd>Esc</kbd> closes dialogs, menus and popovers.</li>
+              <li><kbd>↑</kbd> <kbd>↓</kbd> move through menu and command items.</li>
+              <li><kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd> opens the command palette anywhere.</li>
+              <li>Focus returns to the trigger after every dismissal.</li>
+            </ul>
+            <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+              The page uses native <code>&lt;dialog&gt;</code> and the popover API. The runtime adds behaviour, not a
+              parallel widget model.
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="fui-stat">
+          <span class="fui-stat-label">Runtime</span>
+          <span class="fui-stat-value">0 deps</span>
+          <span class="fui-stat-delta" data-trend="up">tree-shakeable modules</span>
+        </div>
+        <div class="fui-stat">
+          <span class="fui-stat-label">Focus</span>
+          <span class="fui-stat-value">Restored</span>
+          <span class="fui-stat-delta">native top layer</span>
+        </div>
+        <div class="fui-stat">
+          <span class="fui-stat-label">Theme</span>
+          <span class="fui-stat-value">3 modes</span>
+          <span class="fui-stat-delta">no flash</span>
+        </div>
+        <div class="fui-stat">
+          <span class="fui-stat-label">Motion</span>
+          <span class="fui-stat-value">Safe</span>
+          <span class="fui-stat-delta">reduced-motion aware</span>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200 dark:border-slate-800">
+      <div
+        class="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between dark:text-slate-400"
+      >
+        <p>FlexUI 2.0 component example. MIT licensed.</p>
+        <p class="font-mono">@flexui/runtime · examples/components</p>
+      </div>
+    </footer>
+
+    <!-- Dialog -->
+    <dialog id="demo-dialog" class="fui-dialog" data-fui-dialog aria-labelledby="demo-dialog-title">
+      <div class="fui-dialog-header">
+        <div>
+          <h2 class="fui-dialog-title" id="demo-dialog-title">Create a workspace</h2>
+          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            Focus is trapped by the native top layer; the runtime restores it on close.
+          </p>
+        </div>
+        <button type="button" class="fui-dialog-close" data-fui-close aria-label="Close dialog">×</button>
+      </div>
+      <form id="demo-dialog-form" data-demo-form>
+        <div class="fui-dialog-body space-y-4">
+          <div class="fui-field">
+            <label class="fui-label" for="demo-name">Workspace name</label>
+            <input id="demo-name" name="name" class="fui-input" value="Acme design" autofocus />
+          </div>
+          <div class="fui-field">
+            <label class="fui-label" for="demo-plan">Plan</label>
+            <select id="demo-plan" name="plan" class="fui-select">
+              <option>Starter</option>
+              <option selected>Team</option>
+              <option>Enterprise</option>
+            </select>
+          </div>
+          <label class="fui-check">
+            <input type="checkbox" class="fui-checkbox" checked />
+            Invite teammates after creation
+          </label>
+        </div>
+        <div class="fui-dialog-footer">
+          <button type="button" class="fui-btn fui-btn--ghost" data-fui-close>Cancel</button>
+          <button type="submit" class="fui-btn fui-btn--primary">Create workspace</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Drawer -->
+    <dialog
+      id="settings-drawer"
+      class="fui-drawer"
+      data-fui-drawer
+      data-fui-side="right"
+      aria-labelledby="settings-drawer-title"
+    >
+      <div class="fui-drawer-header">
+        <div>
+          <h2 class="fui-dialog-title" id="settings-drawer-title">Preferences</h2>
+          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">A drawer is a dialog pinned to an edge.</p>
+        </div>
+        <button type="button" class="fui-dialog-close" data-fui-close aria-label="Close drawer">×</button>
+      </div>
+      <div class="fui-drawer-body space-y-5">
+        <label class="flex items-center justify-between gap-4 text-sm">
+          <span>
+            <span class="block font-medium text-slate-900 dark:text-slate-100">Email digest</span>
+            <span class="block text-xs text-slate-500 dark:text-slate-400">A weekly summary of activity.</span>
+          </span>
+          <input type="checkbox" class="fui-switch" checked />
+        </label>
+        <label class="flex items-center justify-between gap-4 text-sm">
+          <span>
+            <span class="block font-medium text-slate-900 dark:text-slate-100">Desktop notifications</span>
+            <span class="block text-xs text-slate-500 dark:text-slate-400">Only for mentions and reviews.</span>
+          </span>
+          <input type="checkbox" class="fui-switch" />
+        </label>
+        <div class="fui-field">
+          <label class="fui-label" for="drawer-density">Density</label>
+          <select id="drawer-density" class="fui-select">
+            <option>Comfortable</option>
+            <option>Compact</option>
+          </select>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+          The drawer uses <code>showModal()</code>, so the page behind it is inert and the Escape key works without
+          custom handling.
+        </div>
+      </div>
+      <div class="fui-drawer-footer">
+        <button type="button" class="fui-btn fui-btn--ghost" data-fui-close>Cancel</button>
+        <button type="button" class="fui-btn fui-btn--primary" data-drawer-save>Save preferences</button>
+      </div>
+    </dialog>
+
+    <!-- Command palette -->
+    <dialog
+      id="command-palette"
+      class="fui-dialog fui-cmd-dialog"
+      data-fui-dialog
+      data-fui-command
+      aria-label="Command palette"
+    >
+      <div class="fui-cmd">
+        <input
+          type="text"
+          class="fui-cmd-input"
+          data-fui-command-input
+          placeholder="Search commands…"
+          aria-label="Search commands"
+          role="combobox"
+          aria-expanded="true"
+          aria-autocomplete="list"
+        />
+        <div class="fui-cmd-list" data-fui-command-list role="listbox" aria-label="Commands">
+          <button
+            type="button"
+            class="fui-cmd-item"
+            role="option"
+            data-fui-command-item
+            data-value="dialog"
+            data-keywords="modal create workspace"
+            tabindex="-1"
+          >
+            <span class="flex-1 text-left">Open the create-workspace dialog</span>
+            <kbd class="text-xs text-slate-400">↵</kbd>
+          </button>
+          <button
+            type="button"
+            class="fui-cmd-item"
+            role="option"
+            data-fui-command-item
+            data-value="drawer"
+            data-keywords="preferences settings panel"
+            tabindex="-1"
+          >
+            <span class="flex-1 text-left">Open preferences drawer</span>
+            <kbd class="text-xs text-slate-400">↵</kbd>
+          </button>
+          <button
+            type="button"
+            class="fui-cmd-item"
+            role="option"
+            data-fui-command-item
+            data-value="theme"
+            data-keywords="dark light system appearance"
+            tabindex="-1"
+          >
+            <span class="flex-1 text-left">Toggle colour theme</span>
+            <kbd class="text-xs text-slate-400">T</kbd>
+          </button>
+          <button
+            type="button"
+            class="fui-cmd-item"
+            role="option"
+            data-fui-command-item
+            data-value="toast"
+            data-keywords="notification success message"
+            tabindex="-1"
+          >
+            <span class="flex-1 text-left">Send a success toast</span>
+            <kbd class="text-xs text-slate-400">↵</kbd>
+          </button>
+          <button
+            type="button"
+            class="fui-cmd-item"
+            role="option"
+            data-fui-command-item
+            data-value="tabs"
+            data-keywords="jump accessibility keyboard"
+            tabindex="-1"
+          >
+            <span class="flex-1 text-left">Jump to the tabs example</span>
+            <kbd class="text-xs text-slate-400">G</kbd>
+          </button>
+        </div>
+        <p class="fui-cmd-empty" data-fui-command-empty hidden>No commands found.</p>
+      </div>
+    </dialog>
+
+    <div
+      class="fui-toast-region"
+      data-fui-toast-region
+      role="region"
+      aria-label="Notifications"
+      aria-live="polite"
+      aria-atomic="false"
+    ></div>
+
+    <script type="module" src="dist/main.js"></script>
+  </body>
+</html>

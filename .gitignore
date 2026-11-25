@@ -1,0 +1,27 @@
+# Go build output
+/bin/
+/dist/
+*.exe
+*.test
+*.out
+
+# Local toolchain used only to build the compiler in this workspace.
+.toolchain/
+
+# FlexUI build cache
+.flexui/
+node_modules/
+
+# Compiled TypeScript (built by `tsc`, run automatically on install)
+packages/cli/dist/
+
+# Cross-compiled binaries (built by scripts/build-binaries.sh for releases)
+packages/cli/binaries/
+packages/cli-*/flexui
+packages/cli-*/flexui.exe
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

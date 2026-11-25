@@ -1,0 +1,98 @@
+@flexui base;
+@flexui utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Lock the page while any runtime modal is open. */
+html[data-fui-overlay-open] body {
+  overflow: hidden;
+}
+
+/* Runtime-created event log rows. */
+.fui-log {
+  max-height: 15rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.fui-log-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.4rem 0.25rem;
+  border-bottom: 1px dashed var(--flexui-line);
+  color: var(--flexui-fg-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.fui-log-item:last-child {
+  border-bottom: 0;
+}
+
+.fui-log-time {
+  flex-shrink: 0;
+  color: var(--flexui-fg-subtle);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The command palette is a dialog with a command card inside it. */
+.fui-cmd-dialog {
+  width: calc(100% - 2rem);
+  max-width: 32rem;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.fui-cmd-dialog .fui-cmd {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: min(34rem, calc(100dvh - 3rem));
+}
+
+.fui-cmd-dialog .fui-cmd-list {
+  flex: 1;
+  min-height: 0;
+}
+
+.fui-cmd-item kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.fui-dialog {
+  max-height: calc(100dvh - 2rem);
+}
+
+[data-fui-theme-set][aria-pressed="true"] {
+  background-color: var(--flexui-fg);
+  border-color: var(--flexui-fg);
+  color: var(--flexui-surface);
+}
+
+.fui-toast[data-fui-toast-state="closed"] {
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .fui-toast[data-fui-toast-state="closed"] {
+    transition: none;
+  }
+}

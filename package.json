@@ -1,0 +1,25 @@
+{
+  "name": "flexui-monorepo",
+  "private": true,
+  "version": "2.0.0-alpha.1",
+  "description": "FlexUI 2.0 monorepo: Go compiler, TypeScript npm CLI and examples",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build:compiler": "go build -o bin/flexui ./cmd/flexui",
+    "build:js": "tsc -p packages/cli/tsconfig.json",
+    "build:runtime": "tsc -p packages/runtime/tsconfig.json",
+    "build:example": "tsc -p examples/components/tsconfig.json",
+    "build:components": "tsc -p packages/runtime/tsconfig.json && tsc -p examples/components/tsconfig.json",
+    "typecheck": "tsc -p packages/cli/tsconfig.json --noEmit && tsc -p scripts/tsconfig.json && tsc -p packages/runtime/tsconfig.json --noEmit && tsc -p examples/components/tsconfig.json --noEmit",
+    "build:binaries": "bash scripts/build-binaries.sh",
+    "test": "go test ./...",
+    "vet": "go vet ./..."
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.10",
+    "typescript": "^7.0.2"
+  }
+}
