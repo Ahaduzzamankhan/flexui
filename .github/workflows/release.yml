@@ -36,13 +36,7 @@ jobs:
             git fetch --tags origin
             existing="$(git rev-parse -q --verify "refs/tags/$tag" || true)"
             if [ -n "$existing" ]; then
-              current="$(git rev-parse HEAD)"
-              tagged="$(git rev-list -n 1 "$tag")"
-              if [ "$tagged" != "$current" ]; then
-                echo "Tag $tag already exists on a different commit; refusing to move it."
-                exit 1
-              fi
-              echo "Tag $tag already points to this commit; reusing it."
+              echo "Tag $tag already exists; reusing it without moving or recreating it."
             else
               git tag "$tag"
               git push origin "$tag"
@@ -118,18 +112,30 @@ jobs:
           bun scripts/release.ts --skip-build > dist-release/release-log.txt
           cat dist-release/release-log.txt
 
-      - name: create GitHub release
+      - name: create or update GitHub release assets
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="${{ needs.tag.outputs.release_tag }}"
-          gh release create "$tag" \
-            --title "FlexUI ${tag#v}" \
-            --notes-file dist-release/RELEASE_NOTES.md \
-            packages/cli-*/flexui \
-            packages/cli-*/flexui.exe \
-            packages/cli/checksums.json \
+          assets=(
+            packages/cli-*/flexui
+            packages/cli-*/flexui.exe
+            packages/cli/checksums.json
             dist-release/SHA256SUMS
+          )
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; updating notes and replacing matching assets."
+            gh release edit "$tag" \
+              --title "FlexUI ${tag#v}" \
+              --notes-file dist-release/RELEASE_NOTES.md
+            gh release upload "$tag" "${assets[@]}" --clobber
+          else
+            gh release create "$tag" \
+              --title "FlexUI ${tag#v}" \
+              --notes-file dist-release/RELEASE_NOTES.md \
+              "${assets[@]}"
+          fi
 
   npm:
     name: Publish npm packages
