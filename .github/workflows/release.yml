@@ -98,31 +98,42 @@ jobs:
     name: Publish npm packages
     needs: release
     runs-on: ubuntu-latest
-    if: ${{ secrets.NPM_TOKEN != '' }}
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - if: env.NPM_TOKEN != ''
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - if: env.NPM_TOKEN != ''
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
 
-      - uses: actions/setup-go@v5
+      - if: env.NPM_TOKEN != ''
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: true
 
-      - uses: oven-sh/setup-bun@v2
+      - if: env.NPM_TOKEN != ''
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      - run: bun install --frozen-lockfile
-      - run: bash scripts/build-binaries.sh
-      - run: bun run build:js
-      - run: bun run build:runtime
-      - run: bun run build:integrations
+      - if: env.NPM_TOKEN != ''
+        run: bun install --frozen-lockfile
+      - if: env.NPM_TOKEN != ''
+        run: bash scripts/build-binaries.sh
+      - if: env.NPM_TOKEN != ''
+        run: bun run build:js
+      - if: env.NPM_TOKEN != ''
+        run: bun run build:runtime
+      - if: env.NPM_TOKEN != ''
+        run: bun run build:integrations
 
       - name: publish platform packages first
+        if: env.NPM_TOKEN != ''
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -131,6 +142,7 @@ jobs:
           done
 
       - name: publish runtime and integrations
+        if: env.NPM_TOKEN != ''
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -141,6 +153,7 @@ jobs:
           npm publish packages/vite-plugin --access public --ignore-scripts
 
       - name: publish the CLI last
+        if: env.NPM_TOKEN != ''
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish packages/cli --access public --ignore-scripts
