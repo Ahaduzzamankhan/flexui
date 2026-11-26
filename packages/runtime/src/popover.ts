@@ -197,6 +197,26 @@ export class PopoverController {
   }
 }
 
+/** Returns the controller bound to a trigger, if any. */
+export function getPopover(trigger: HTMLElement): PopoverController | undefined {
+  return controllers.get(trigger);
+}
+
+/** Creates or reuses the controller for a trigger and its panel. */
+export function bindPopover(
+  trigger: HTMLElement,
+  panel: HTMLElement,
+  options: PopoverOptions = {},
+): PopoverController {
+  const existing = controllers.get(trigger);
+  if (existing) {
+    return existing;
+  }
+  const controller = new PopoverController(trigger, panel, options);
+  controllers.set(trigger, controller);
+  return controller;
+}
+
 /** Binds popovers declared with data-fui-popover="<target>". */
 export function initPopovers(root: ParentNode = document): Cleanup {
   if (typeof document === "undefined") {
@@ -217,8 +237,7 @@ export function initPopovers(root: ParentNode = document): Cleanup {
     if (!panel) {
       continue;
     }
-    const controller = new PopoverController(trigger, panel);
-    controllers.set(trigger, controller);
+    const controller = bindPopover(trigger, panel);
     disposer.add(() => controller.dispose());
   }
 

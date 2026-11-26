@@ -1,0 +1,146 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify tag and tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: tag matches version.json
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          expected="$(bun scripts/version.ts tag)"
+          echo "tag: $tag"
+          echo "version.json: $expected"
+          if [ "$tag" != "$expected" ]; then
+            echo "Refusing to release: the pushed tag does not match version.json."
+            exit 1
+          fi
+
+      - name: version consistency
+        run: bun run version:check
+
+      - run: go vet ./...
+      - run: go test ./...
+      - run: bun run typecheck
+      - run: bun test packages/runtime/test packages/vite-plugin/test
+
+  release:
+    name: Build binaries and publish release
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: build binaries
+        run: bash scripts/build-binaries.sh
+
+      - name: write release notes from CHANGELOG.md
+        run: bun scripts/version.ts notes --out dist-release/RELEASE_NOTES.md
+
+      - name: checksums
+        run: |
+          mkdir -p dist-release
+          bun scripts/release.ts --skip-build > dist-release/release-log.txt
+          cat dist-release/release-log.txt
+
+      - name: create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="$(bun scripts/version.ts tag)"
+          gh release create "$tag" \
+            --title "FlexUI ${tag#v}" \
+            --notes-file dist-release/RELEASE_NOTES.md \
+            packages/cli-*/flexui \
+            packages/cli-*/flexui.exe \
+            packages/cli/checksums.json \
+            dist-release/SHA256SUMS
+
+  npm:
+    name: Publish npm packages
+    needs: release
+    runs-on: ubuntu-latest
+    if: ${{ secrets.NPM_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+      - run: bash scripts/build-binaries.sh
+      - run: bun run build:js
+      - run: bun run build:runtime
+      - run: bun run build:integrations
+
+      - name: publish platform packages first
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for dir in packages/cli-*/; do
+            npm publish "$dir" --access public --ignore-scripts
+          done
+
+      - name: publish runtime and integrations
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm publish packages/runtime --access public --ignore-scripts
+          npm publish packages/react --access public --ignore-scripts
+          npm publish packages/vue --access public --ignore-scripts
+          npm publish packages/svelte --access public --ignore-scripts
+          npm publish packages/vite-plugin --access public --ignore-scripts
+
+      - name: publish the CLI last
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish packages/cli --access public --ignore-scripts

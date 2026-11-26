@@ -26,10 +26,15 @@ import (
 )
 
 // Version is the FlexUI release version reported by the CLI and the compiler.
-const Version = "2.0.0-alpha.1"
+//
+// version.json is the single source of truth. Release builds inject the value
+// with -ldflags "-X .../internal/compiler.Version=<version>"; the default below
+// keeps `go run` and `go build` working, and TestVersionMatchesVersionFile fails
+// if the two ever drift apart.
+var Version = "2.0.0-alpha.1"
 
 // Banner is the comment written at the top of generated stylesheets.
-const Banner = "FlexUI " + Version + " - generated stylesheet. Do not edit by hand."
+var Banner = "FlexUI " + Version + " - generated stylesheet. Do not edit by hand."
 
 // Options configures a build.
 type Options struct {
@@ -50,12 +55,17 @@ type Options struct {
 
 // Stats describes a completed build.
 type Stats struct {
-	Files      int           `json:"files"`
-	Candidates int           `json:"candidates"`
-	Rules      int           `json:"rules"`
-	Bytes      int           `json:"bytes"`
-	Duration   time.Duration `json:"-"`
-	CacheHit   bool          `json:"-"`
+	Files      int `json:"files"`
+	Candidates int `json:"candidates"`
+	Rules      int `json:"rules"`
+	Bytes      int `json:"bytes"`
+	// Reused counts files whose candidates came from the incremental manifest
+	// because their size and modification time were unchanged. Parsed counts
+	// files that had to be read and extracted again.
+	Reused   int           `json:"reused,omitempty"`
+	Parsed   int           `json:"parsed,omitempty"`
+	Duration time.Duration `json:"-"`
+	CacheHit bool          `json:"-"`
 }
 
 // Result is a compiled stylesheet plus statistics.
@@ -92,25 +102,54 @@ func Build(opts Options) (Result, error) {
 	res.Stats.Files = len(files)
 	logf("scanned %d files", len(files))
 
-	// Read every source file concurrently, then hash them for the cache key.
-	sources := make([][]byte, len(files))
+	// Reuse the manifest's per-file entries when a file's size and modification
+	// time are unchanged. An unchanged file is never opened, so a rebuild after
+	// editing one file reads that file instead of the whole project. `--no-cache`
+	// skips the manifest entirely and re-reads everything.
+	manifests := cache.OpenManifest(root)
+	var manifest *cache.Manifest
+	if !opts.NoCache {
+		manifest = manifests.Load()
+	}
+	parsed := 0
+	entries := make([]cache.FileEntry, len(files))
 	var readErr error
 	var readMu sync.Mutex
 	parallel(len(files), workers(), func(i int) {
-		data, err := os.ReadFile(files[i])
-		if err != nil {
-			readMu.Lock()
-			if readErr == nil {
-				readErr = fmt.Errorf("read %s: %w", files[i], err)
-			}
-			readMu.Unlock()
+		path := files[i]
+		info, statErr := os.Stat(path)
+		if statErr != nil {
+			setReadError(&readErr, &readMu, fmt.Errorf("read %s: %w", path, statErr))
 			return
 		}
-		sources[i] = data
+		if manifest != nil {
+			if entry, ok := manifest.Files[relPath(root, path)]; ok &&
+				entry.Size == info.Size() && entry.ModTime == info.ModTime().UnixNano() {
+				entries[i] = entry
+				return
+			}
+		}
+
+		data, err := os.ReadFile(path)
+		if err != nil {
+			setReadError(&readErr, &readMu, fmt.Errorf("read %s: %w", path, err))
+			return
+		}
+		entries[i] = cache.FileEntry{
+			Size:    info.Size(),
+			ModTime: info.ModTime().UnixNano(),
+			Hash:    cache.Hash(data),
+			Tokens:  extractor.Extract(path, data),
+		}
+		readMu.Lock()
+		parsed++
+		readMu.Unlock()
 	})
 	if readErr != nil {
 		return res, readErr
 	}
+	res.Stats.Parsed = parsed
+	res.Stats.Reused = len(files) - parsed
 
 	baseEnabled, utilitiesEnabled, passthrough, err := readInput(root, opts.Input, opts.Base)
 	if err != nil {
@@ -139,11 +178,7 @@ func Build(opts Options) (Result, error) {
 		cfgJSON,
 	}
 	for i, f := range files {
-		rel, relErr := filepath.Rel(root, f)
-		if relErr != nil {
-			rel = f
-		}
-		hashParts = append(hashParts, []byte(filepath.ToSlash(rel)), sources[i])
+		hashParts = append(hashParts, []byte(relPath(root, f)), []byte(entries[i].Hash))
 	}
 	key := cache.Key(hashParts...)
 	res.CacheKey = key
@@ -158,29 +193,32 @@ func Build(opts Options) (Result, error) {
 			if len(meta) > 0 {
 				_ = json.Unmarshal(meta, &res.Stats)
 			}
+			// The whole build was cached, so no file was read in this run;
+			// reporting the previous run's counters would lie.
+			res.Stats.Reused = len(files)
+			res.Stats.Parsed = 0
 			res.Stats.CacheHit = true
 			res.Stats.Duration = time.Since(start)
 			res.Stats.Bytes = len(data)
+			if manifest == nil || parsed > 0 {
+				if saveErr := manifests.Save(manifestOf(root, files, entries)); saveErr != nil {
+					logf("manifest write failed: %v", saveErr)
+				}
+			}
 			logf("cache hit %s", key)
 			return res, nil
 		}
 	}
 
-	// Extract candidates concurrently. Order is irrelevant because the set is
-	// sorted before resolution, which keeps output deterministic.
+	// Candidates are collected from the per-file entries, so a reused file is
+	// never parsed again. Order is irrelevant: the set is sorted before
+	// resolution, which keeps output deterministic.
 	candidates := make(map[string]bool, 1024)
-	var candMu sync.Mutex
-	parallel(len(files), workers(), func(i int) {
-		tokens := extractor.Extract(files[i], sources[i])
-		if len(tokens) == 0 {
-			return
-		}
-		candMu.Lock()
-		for _, t := range tokens {
+	for i := range files {
+		for _, t := range entries[i].Tokens {
 			candidates[t] = true
 		}
-		candMu.Unlock()
-	})
+	}
 	for _, s := range opts.Safelist {
 		for _, f := range strings.Fields(s) {
 			if f != "" {
@@ -243,7 +281,41 @@ func Build(opts Options) (Result, error) {
 			logf("cache write failed: %v", putErr)
 		}
 	}
+	if !opts.NoCache {
+		if saveErr := manifests.Save(manifestOf(root, files, entries)); saveErr != nil {
+			logf("manifest write failed: %v", saveErr)
+		}
+	}
 	return res, nil
+}
+
+// setReadError records the first read failure without a data race.
+func setReadError(target *error, mu *sync.Mutex, err error) {
+	mu.Lock()
+	defer mu.Unlock()
+	if *target == nil {
+		*target = err
+	}
+}
+
+// relPath returns a slash-separated path relative to the project root, so the
+// manifest is portable between platforms and working directories.
+func relPath(root, path string) string {
+	rel, err := filepath.Rel(root, path)
+	if err != nil {
+		return filepath.ToSlash(path)
+	}
+	return filepath.ToSlash(rel)
+}
+
+// manifestOf builds the manifest for the current scan. Files that disappeared
+// are dropped, so the manifest prunes itself as the project changes.
+func manifestOf(root string, files []string, entries []cache.FileEntry) *cache.Manifest {
+	manifest := cache.NewManifest()
+	for i, f := range files {
+		manifest.Files[relPath(root, f)] = entries[i]
+	}
+	return manifest
 }
 
 // applyTheme merges the configuration overrides into the default theme.

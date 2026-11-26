@@ -148,6 +148,20 @@ export class PopoverController {
         this.panel.dataset["fuiSide"] = side;
     }
 }
+/** Returns the controller bound to a trigger, if any. */
+export function getPopover(trigger) {
+    return controllers.get(trigger);
+}
+/** Creates or reuses the controller for a trigger and its panel. */
+export function bindPopover(trigger, panel, options = {}) {
+    const existing = controllers.get(trigger);
+    if (existing) {
+        return existing;
+    }
+    const controller = new PopoverController(trigger, panel, options);
+    controllers.set(trigger, controller);
+    return controller;
+}
 /** Binds popovers declared with data-fui-popover="<target>". */
 export function initPopovers(root = document) {
     if (typeof document === "undefined") {
@@ -165,8 +179,7 @@ export function initPopovers(root = document) {
         if (!panel) {
             continue;
         }
-        const controller = new PopoverController(trigger, panel);
-        controllers.set(trigger, controller);
+        const controller = bindPopover(trigger, panel);
         disposer.add(() => controller.dispose());
     }
     return () => disposer.dispose();

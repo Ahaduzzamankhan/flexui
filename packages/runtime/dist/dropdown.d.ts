@@ -24,5 +24,9 @@ export declare class Dropdown {
     private handleMenuKey;
     private handleMenuClick;
 }
+/** Returns the controller bound to a trigger, if any. */
+export declare function getDropdown(trigger: HTMLElement): Dropdown | undefined;
+/** Creates or reuses the controller for a trigger and its menu. */
+export declare function bindDropdown(trigger: HTMLElement, menu: HTMLElement, options?: DropdownOptions): Dropdown;
 /** Binds dropdowns declared with data-fui-dropdown="<target>". */
 export declare function initDropdowns(root?: ParentNode): Cleanup;

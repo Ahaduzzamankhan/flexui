@@ -21,6 +21,13 @@ func Open(root string) *Cache {
 // Dir returns the cache directory.
 func (c *Cache) Dir() string { return c.dir }
 
+// Hash returns the SHA-256 of one file's contents as hex, used to identify a
+// file's content in the incremental manifest and in the build key.
+func Hash(data []byte) string {
+	sum := sha256.Sum256(data)
+	return hex.EncodeToString(sum[:])
+}
+
 // Key hashes a list of byte chunks into a file-safe key.
 func Key(parts ...[]byte) string {
 	h := sha256.New()

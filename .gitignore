@@ -20,6 +20,9 @@ packages/cli/binaries/
 packages/cli-*/flexui
 packages/cli-*/flexui.exe
 
+# Release artifacts produced by scripts/release.ts
+/dist-release/
+
 # Editor / OS noise
 .DS_Store
 Thumbs.db

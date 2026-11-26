@@ -12,9 +12,11 @@ export function initDrawers(root = document) {
     const disposer = createDisposer();
     for (const element of qsa(root, "dialog[data-fui-drawer]")) {
         element.dataset["fuiSide"] = drawerSide(element);
-        if (!getDialog(element)) {
-            disposer.add(() => bindDialog(element).dispose());
+        if (getDialog(element) !== undefined) {
+            continue;
         }
+        const controller = bindDialog(element);
+        disposer.add(() => controller.dispose());
     }
     disposer.add(bindOverlayTriggers());
     return () => disposer.dispose();

@@ -22,5 +22,9 @@ export declare class Tabs {
     dispose(): void;
     private handleKeydown;
 }
+/** Returns the controller bound to a tabs container, if any. */
+export declare function getTabs(root: HTMLElement): Tabs | undefined;
+/** Creates or reuses the controller for a tabs container. */
+export declare function bindTabs(root: HTMLElement): Tabs;
 /** Binds every [data-fui-tabs] container under root. */
 export declare function initTabs(root?: ParentNode): Cleanup;

@@ -1,0 +1,39 @@
+{
+  "name": "@flexui/svelte",
+  "version": "2.0.0-alpha.1",
+  "description": "Svelte actions for FlexUI interactive components",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@flexui/runtime": "2.0.0-alpha.1"
+  },
+  "peerDependencies": {
+    "svelte": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "svelte": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "flexui",
+    "svelte",
+    "actions"
+  ]
+}

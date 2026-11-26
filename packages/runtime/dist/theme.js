@@ -1,6 +1,9 @@
 import { createDisposer, emit, on, qsa } from "./types.js";
 const DEFAULT_STORAGE_KEY = "flexui-theme";
 let currentMode = null;
+// Set by initTheme so getTheme()/setTheme()/toggleTheme() read and write the
+// same key as the controls, even when a custom storageKey was configured.
+let activeStorageKey = DEFAULT_STORAGE_KEY;
 function isThemeMode(value) {
     return value === "light" || value === "dark" || value === "system";
 }
@@ -48,7 +51,7 @@ export function getTheme() {
     if (currentMode) {
         return currentMode;
     }
-    currentMode = readStored(DEFAULT_STORAGE_KEY) ?? "system";
+    currentMode = readStored(activeStorageKey) ?? "system";
     return currentMode;
 }
 /** Applies a mode to <html> and optionally emits fui:themechange. */
@@ -81,8 +84,11 @@ export function nextTheme(mode = getTheme()) {
 /** Sets and (by default) persists a theme mode. */
 export function setTheme(mode, options = {}) {
     applyTheme(mode, options.silent);
+    if (options.storageKey !== undefined) {
+        activeStorageKey = options.storageKey;
+    }
     if (options.persist !== false) {
-        writeStored(options.storageKey ?? DEFAULT_STORAGE_KEY, mode);
+        writeStored(activeStorageKey, mode);
     }
     syncThemeControls();
     return mode;
@@ -114,6 +120,7 @@ export function initTheme(options = {}) {
     const disposer = createDisposer();
     const root = options.root ?? document;
     const key = options.storageKey ?? DEFAULT_STORAGE_KEY;
+    activeStorageKey = key;
     const saved = readStored(key);
     applyTheme(saved ?? "system", true);
     syncThemeControls(root);

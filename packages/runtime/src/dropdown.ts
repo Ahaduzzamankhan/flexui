@@ -80,6 +80,8 @@ export class Dropdown {
             !this.menu.contains(target) &&
             !this.trigger.contains(target)
           ) {
+            // Focus stays where the user clicked; only Escape and selection
+            // hand focus back to the trigger.
             this.close(false);
           }
         },
@@ -223,6 +225,26 @@ export class Dropdown {
   }
 }
 
+/** Returns the controller bound to a trigger, if any. */
+export function getDropdown(trigger: HTMLElement): Dropdown | undefined {
+  return controllers.get(trigger);
+}
+
+/** Creates or reuses the controller for a trigger and its menu. */
+export function bindDropdown(
+  trigger: HTMLElement,
+  menu: HTMLElement,
+  options: DropdownOptions = {},
+): Dropdown {
+  const existing = controllers.get(trigger);
+  if (existing) {
+    return existing;
+  }
+  const controller = new Dropdown(trigger, menu, options);
+  controllers.set(trigger, controller);
+  return controller;
+}
+
 /** Binds dropdowns declared with data-fui-dropdown="<target>". */
 export function initDropdowns(root: ParentNode = document): Cleanup {
   if (typeof document === "undefined") {
@@ -240,8 +262,7 @@ export function initDropdowns(root: ParentNode = document): Cleanup {
     if (!menu) {
       continue;
     }
-    const controller = new Dropdown(trigger, menu);
-    controllers.set(trigger, controller);
+    const controller = bindDropdown(trigger, menu);
     disposer.add(() => controller.dispose());
   }
 

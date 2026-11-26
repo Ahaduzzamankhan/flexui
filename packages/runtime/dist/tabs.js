@@ -126,6 +126,20 @@ export class Tabs {
         this.activate(nextIndex, true);
     }
 }
+/** Returns the controller bound to a tabs container, if any. */
+export function getTabs(root) {
+    return controllers.get(root);
+}
+/** Creates or reuses the controller for a tabs container. */
+export function bindTabs(root) {
+    const existing = controllers.get(root);
+    if (existing) {
+        return existing;
+    }
+    const controller = new Tabs(root);
+    controllers.set(root, controller);
+    return controller;
+}
 /** Binds every [data-fui-tabs] container under root. */
 export function initTabs(root = document) {
     if (typeof document === "undefined") {
@@ -139,8 +153,7 @@ export function initTabs(root = document) {
         if (!qs(element, '[role="tablist"], [data-fui-tablist]') && element.getAttribute("role") !== "tablist") {
             continue;
         }
-        const controller = new Tabs(element);
-        controllers.set(element, controller);
+        const controller = bindTabs(element);
         disposer.add(() => controller.dispose());
     }
     return () => disposer.dispose();

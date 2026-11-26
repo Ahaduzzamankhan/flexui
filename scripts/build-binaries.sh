@@ -10,8 +10,15 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
 OUT="$ROOT/packages/cli/binaries"
-VERSION="$(grep -m1 '"version"' packages/cli/package.json | sed -E 's/.*"version": *"([^"]+)".*/\1/')"
-VERSION="${VERSION:-2.0.0-alpha.1}"
+# version.json is the single source of truth; cmd/version resolves it without
+# needing jq or any other tool.
+VERSION="$(go run ./cmd/version -field version)"
+if [ -z "$VERSION" ]; then
+  echo "could not resolve the version from version.json" >&2
+  exit 1
+fi
+LDFLAGS="-s -w -X github.com/Ahaduzzamankhan/flexui/internal/compiler.Version=$VERSION"
+echo "version $VERSION"
 
 mkdir -p "$OUT"
 printf '%s\n' "{" > "$ROOT/packages/cli/checksums.json"
@@ -29,7 +36,7 @@ for target in "windows amd64 win32-x64 flexui.exe" \
   mkdir -p "$dest"
   echo "building $goos/$goarch -> packages/cli-$key/$name"
   GOOS="$goos" GOARCH="$goarch" CGO_ENABLED=0 \
-    go build -trimpath -ldflags "-s -w" -o "$dest/$name" ./cmd/flexui
+    go build -trimpath -ldflags "$LDFLAGS" -o "$dest/$name" ./cmd/flexui
   mkdir -p "$OUT/$key"
   cp "$dest/$name" "$OUT/$key/$name"
   sum="$(sha256sum "$dest/$name" | cut -d' ' -f1)"

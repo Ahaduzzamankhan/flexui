@@ -1,0 +1,37 @@
+{
+  "name": "@flexui/react",
+  "version": "2.0.0-alpha.1",
+  "description": "React hooks for FlexUI interactive components",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@flexui/runtime": "2.0.0-alpha.1"
+  },
+  "peerDependencies": {
+    "react": "^19.3.1"
+  },
+  "keywords": [
+    "flexui",
+    "react",
+    "hooks"
+  ],
+  "devDependencies": {
+    "@types/react": "^19.3.3"
+  }
+}

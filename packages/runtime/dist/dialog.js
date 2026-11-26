@@ -8,10 +8,10 @@ function syncOverlayLock() {
     }
     const root = document.documentElement;
     if (openOverlays > 0) {
-        root.dataset["fuiOverlayOpen"] = "";
+        root.setAttribute("data-fui-overlay-open", "");
     }
     else {
-        delete root.dataset["fuiOverlayOpen"];
+        root.removeAttribute("data-fui-overlay-open");
     }
 }
 function eventReason(element, fallback) {
@@ -222,9 +222,11 @@ export function initDialogs(root = document) {
     }
     const disposer = createDisposer();
     for (const element of qsa(root, "dialog[data-fui-dialog], dialog[data-fui-drawer]")) {
-        if (!controllers.has(element)) {
-            disposer.add(() => bindDialog(element).dispose());
+        if (controllers.has(element)) {
+            continue;
         }
+        const controller = bindDialog(element);
+        disposer.add(() => controller.dispose());
     }
     for (const trigger of qsa(root, "[data-fui-open], [data-fui-dialog-open]")) {
         const value = trigger.getAttribute("data-fui-open") ?? trigger.getAttribute("data-fui-dialog-open");

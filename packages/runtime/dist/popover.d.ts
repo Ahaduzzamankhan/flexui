@@ -29,6 +29,10 @@ export declare class PopoverController {
     private syncOpen;
     private position;
 }
+/** Returns the controller bound to a trigger, if any. */
+export declare function getPopover(trigger: HTMLElement): PopoverController | undefined;
+/** Creates or reuses the controller for a trigger and its panel. */
+export declare function bindPopover(trigger: HTMLElement, panel: HTMLElement, options?: PopoverOptions): PopoverController;
 /** Binds popovers declared with data-fui-popover="<target>". */
 export declare function initPopovers(root?: ParentNode): Cleanup;
 export {};

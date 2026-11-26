@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    name: Go compiler
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: gofmt
+        run: |
+          unformatted="$(gofmt -l internal cmd)"
+          if [ -n "$unformatted" ]; then
+            echo "These files are not gofmt-formatted:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test ./...
+
+      - name: compiler builds
+        run: go build ./...
+
+  typescript:
+    name: TypeScript packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: install
+        run: bun install --frozen-lockfile
+
+      - name: version consistency
+        run: bun run version:check
+
+      - name: typecheck
+        run: bun run typecheck
+
+      - name: runtime and plugin tests
+        run: bun test packages/runtime/test packages/vite-plugin/test
+
+  binaries:
+    name: Cross-compiled binaries
+    needs: [go, typescript]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: build all platforms
+        run: bash scripts/build-binaries.sh
+
+      - name: verified binary reports the released version
+        run: |
+          expected="$(go run ./cmd/version -field version)"
+          actual="$(./packages/cli-linux-x64/flexui version)"
+          echo "expected: $expected"
+          echo "actual:   $actual"
+          case "$actual" in
+            *"$expected"*) ;;
+            *) echo "binary version does not match version.json"; exit 1 ;;
+          esac
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flexui-binaries
+          if-no-files-found: error
+          path: |
+            packages/cli-*/flexui
+            packages/cli-*/flexui.exe
+            packages/cli/checksums.json

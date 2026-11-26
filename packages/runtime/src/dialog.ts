@@ -28,9 +28,9 @@ function syncOverlayLock(): void {
   }
   const root = document.documentElement;
   if (openOverlays > 0) {
-    root.dataset["fuiOverlayOpen"] = "";
+    root.setAttribute("data-fui-overlay-open", "");
   } else {
-    delete root.dataset["fuiOverlayOpen"];
+    root.removeAttribute("data-fui-overlay-open");
   }
 }
 
@@ -280,9 +280,11 @@ export function initDialogs(root: ParentNode = document): Cleanup {
   const disposer = createDisposer();
 
   for (const element of qsa<HTMLDialogElement>(root, "dialog[data-fui-dialog], dialog[data-fui-drawer]")) {
-    if (!controllers.has(element)) {
-      disposer.add(() => bindDialog(element).dispose());
+    if (controllers.has(element)) {
+      continue;
     }
+    const controller = bindDialog(element);
+    disposer.add(() => controller.dispose());
   }
 
   for (const trigger of qsa<HTMLElement>(root, "[data-fui-open], [data-fui-dialog-open]")) {

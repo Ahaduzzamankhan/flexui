@@ -57,6 +57,11 @@
       "types": "./dist/focus.d.ts",
       "import": "./dist/focus.js",
       "default": "./dist/focus.js"
+    },
+    "./auto": {
+      "types": "./dist/auto.d.ts",
+      "import": "./dist/auto.js",
+      "default": "./dist/auto.js"
     }
   },
   "files": [
@@ -65,7 +70,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "bun test test"
   },
   "keywords": [
     "flexui",
@@ -73,5 +79,8 @@
     "runtime",
     "dialog",
     "accessibility"
-  ]
+  ],
+  "devDependencies": {
+    "happy-dom": "^21.0.4"
+  }
 }
