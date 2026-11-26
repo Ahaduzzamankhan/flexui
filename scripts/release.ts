@@ -3,7 +3,7 @@
  *
  *   bun scripts/release.ts                 # build + prepare dist-release, no tag
  *   bun scripts/release.ts --publish       # also tag, push and create the GitHub release
- *   bun scripts/release.ts --skip-build    # reuse existing packages/cli-*/ binaries
+ *   bun scripts/release.ts --skip-build    # reuse existing packages/cli-<platform>/ binaries
  *
  * The version comes from version.json (see scripts/version.ts). Release notes
  * are the CHANGELOG.md section for that version, so a release cannot be
@@ -94,7 +94,7 @@ function writeNotes(info: VersionInfo, notes: string, assets: readonly string[])
     "- `checksums.json` and `SHA256SUMS` with the SHA-256 of every binary",
     "",
     "```",
-    ...assets.map((asset) => asset.replace(/\\/g, "/")),
+    ...assets.map((asset) => asset.replace(/\\\\/g, "/")),
     "```",
     "",
   ].join("\n");
