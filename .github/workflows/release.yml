@@ -107,10 +107,28 @@ jobs:
         run: bun scripts/version.ts notes --out dist-release/RELEASE_NOTES.md
 
       - name: checksums
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p dist-release
-          bun scripts/release.ts --skip-build > dist-release/release-log.txt
-          cat dist-release/release-log.txt
+          shopt -s nullglob
+
+          binaries=(
+            packages/cli-win32-*/flexui.exe
+            packages/cli-linux-*/flexui
+            packages/cli-darwin-*/flexui
+          )
+
+          if [ "${#binaries[@]}" -eq 0 ]; then
+            echo "No compiled binaries found after build-binaries.sh." >&2
+            find packages -maxdepth 3 -type f -print
+            exit 1
+          fi
+
+          printf 'Found %s compiled binaries.\n' "${#binaries[@]}"
+          sha256sum "${binaries[@]}" > dist-release/SHA256SUMS
+          test -s packages/cli/checksums.json
+          test -s dist-release/RELEASE_NOTES.md
 
       - name: create or update GitHub release assets
         env:
