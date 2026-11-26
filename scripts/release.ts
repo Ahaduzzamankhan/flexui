@@ -54,19 +54,30 @@ function capture(command: string, args: readonly string[]): { status: number; st
 /** Every cross-compiled binary produced by scripts/build-binaries.sh. */
 function binaryAssets(): string[] {
   const assets: string[] = [];
-  for (const entry of readdirSync(ROOT)) {
-    if (!entry.startsWith("cli-") || !entry.includes("-")) {
+  const packagesDir = join(ROOT, "packages");
+
+  for (const entry of readdirSync(packagesDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !/^cli-(win32|linux|darwin)-(x64|arm64)$/.test(entry.name)) {
       continue;
     }
-    const dir = join(ROOT, "packages", entry);
-    for (const name of readdirSync(dir)) {
-      if (name === "flexui" || name === "flexui.exe") {
-        assets.push(join("packages", entry, name));
+
+    const dir = join(packagesDir, entry.name);
+    for (const name of ["flexui", "flexui.exe"]) {
+      const path = join(dir, name);
+      try {
+        // Only include the expected executable for each platform.
+        if (name === (entry.name.startsWith("cli-win32-") ? "flexui.exe" : "flexui")) {
+          readFileSync(path);
+          assets.push(join("packages", entry.name, name));
+        }
+      } catch {
+        // A platform binary may be absent; report a useful error if none exist.
       }
     }
   }
+
   if (assets.length === 0) {
-    fail("no binaries found; run `bash scripts/build-binaries.sh` first");
+    fail("no platform binaries found under packages/cli-*/; run `bash scripts/build-binaries.sh` first");
   }
   return assets.sort();
 }
