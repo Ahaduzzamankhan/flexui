@@ -133,13 +133,15 @@ jobs:
 
   npm:
     name: Publish npm packages
-    needs: release
+    needs: [tag, release]
     runs-on: ubuntu-latest
     env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - if: env.NPM_TOKEN != ''
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.tag.outputs.release_tag }}
 
       - if: env.NPM_TOKEN != ''
         uses: actions/setup-node@v4
