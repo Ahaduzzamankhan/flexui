@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -12,12 +13,52 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  tag:
+    name: Resolve or create release tag
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.tag.outputs.release_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: create tag for manual dispatch or validate pushed tag
+        id: tag
+        run: |
+          expected="$(bun scripts/version.ts tag)"
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            tag="$expected"
+            git fetch --tags origin
+            existing="$(git rev-parse -q --verify "refs/tags/$tag" || true)"
+            if [ -n "$existing" ]; then
+              echo "Tag $tag already exists; reusing it without moving or recreating it."
+            else
+              git tag "$tag"
+              git push origin "$tag"
+            fi
+          else
+            tag="$GITHUB_REF_NAME"
+            if [ "$tag" != "$expected" ]; then
+              echo "Refusing to release: pushed tag $tag does not match version.json ($expected)."
+              exit 1
+            fi
+          fi
+          echo "release_tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Release tag: $tag"
+
   verify:
     name: Verify tag and tests
+    needs: tag
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ needs.tag.outputs.release_tag }}
           fetch-depth: 0
 
       - uses: actions/setup-go@v5
@@ -31,17 +72,6 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      - name: tag matches version.json
-        run: |
-          tag="${GITHUB_REF_NAME}"
-          expected="$(bun scripts/version.ts tag)"
-          echo "tag: $tag"
-          echo "version.json: $expected"
-          if [ "$tag" != "$expected" ]; then
-            echo "Refusing to release: the pushed tag does not match version.json."
-            exit 1
-          fi
-
       - name: version consistency
         run: bun run version:check
 
@@ -52,10 +82,12 @@ jobs:
 
   release:
     name: Build binaries and publish release
-    needs: verify
+    needs: [tag, verify]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.tag.outputs.release_tag }}
 
       - uses: actions/setup-go@v5
         with:
@@ -68,26 +100,94 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      - name: build binaries with the version.json version
+      - name: build binaries
         run: bash scripts/build-binaries.sh
 
-      - name: stage assets, notes and checksums
-        run: bun scripts/release.ts --skip-build
+      - name: write release notes from CHANGELOG.md
+        run: bun scripts/version.ts notes --out dist-release/RELEASE_NOTES.md
 
-      - name: create GitHub release
+      - name: checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist-release
+          shopt -s nullglob
+
+          binaries=(
+            packages/cli-win32-*/flexui.exe
+            packages/cli-linux-*/flexui
+            packages/cli-darwin-*/flexui
+          )
+
+          if [ "${#binaries[@]}" -eq 0 ]; then
+            echo "No compiled binaries found after build-binaries.sh." >&2
+            find packages -maxdepth 3 -type f -print
+            exit 1
+          fi
+
+          printf 'Found %s compiled binaries.\n' "${#binaries[@]}"
+          sha256sum "${binaries[@]}" > dist-release/SHA256SUMS
+          test -s packages/cli/checksums.json
+          test -s dist-release/RELEASE_NOTES.md
+
+      - name: create or update GitHub release assets
         env:
           GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
-          tag="$(bun scripts/version.ts tag)"
-          gh release create "$tag" \
-            --title "FlexUI ${tag#v}" \
-            --notes-file dist-release/RELEASE_NOTES.md \
-            dist-release/assets/* \
-            dist-release/SHA256SUMS
+          set -euo pipefail
+          tag="${{ needs.tag.outputs.release_tag }}"
+          asset_dir="dist-release/assets"
+          mkdir -p "$asset_dir"
+
+          # GitHub Release asset names must be unique. Give every platform
+          # binary a stable OS/architecture-specific filename.
+          for source in packages/cli-win32-x64/flexui.exe; do
+            [ -f "$source" ] && cp "$source" "$asset_dir/flexui-windows-x64.exe"
+          done
+          for source in packages/cli-win32-arm64/flexui.exe; do
+            [ -f "$source" ] && cp "$source" "$asset_dir/flexui-windows-arm64.exe"
+          done
+          for source in packages/cli-linux-x64/flexui; do
+            [ -f "$source" ] && cp "$source" "$asset_dir/flexui-linux-x64"
+          done
+          for source in packages/cli-linux-arm64/flexui; do
+            [ -f "$source" ] && cp "$source" "$asset_dir/flexui-linux-arm64"
+          done
+          for source in packages/cli-darwin-x64/flexui; do
+            [ -f "$source" ] && cp "$source" "$asset_dir/flexui-macos-x64"
+          done
+          for source in packages/cli-darwin-arm64/flexui; do
+            [ -f "$source" ] && cp "$source" "$asset_dir/flexui-macos-arm64"
+          done
+
+          cp packages/cli/checksums.json "$asset_dir/checksums.json"
+          cp dist-release/SHA256SUMS "$asset_dir/SHA256SUMS"
+
+          shopt -s nullglob
+          assets=("$asset_dir"/*)
+          if [ "${#assets[@]}" -ne 8 ]; then
+            echo "Expected 6 platform binaries and 2 checksum files; found ${#assets[@]} assets." >&2
+            ls -la "$asset_dir"
+            exit 1
+          fi
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Updating existing release $tag."
+            gh release edit "$tag" \
+              --title "FlexUI ${tag#v}" \
+              --notes-file dist-release/RELEASE_NOTES.md
+            gh release upload "$tag" "${assets[@]}" --clobber
+          else
+            gh release create "$tag" \
+              --title "FlexUI ${tag#v}" \
+              --notes-file dist-release/RELEASE_NOTES.md \
+              "${assets[@]}"
+          fi
 
   npm:
     name: Publish npm packages
-    needs: release
+    needs: [tag, release]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -98,6 +198,8 @@ jobs:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.tag.outputs.release_tag }}
 
       - uses: actions/setup-node@v4
         with:
@@ -113,8 +215,6 @@ jobs:
         with:
           bun-version: latest
 
-      # npm stage publish introduced a review queue; direct publishing needs a
-      # CLI that understands both OIDC and plain npm publish.
       - name: use a current npm CLI
         run: npm install --global npm@^11.15.0
 
@@ -163,7 +263,7 @@ jobs:
           else
             echo "Publishing with the configured NPM_TOKEN."
           fi
-          # publish.ts runs plain npm publish for every package in dependency
-          # order. It never calls npm stage publish, so versions go live as soon
-          # as npm accepts them instead of waiting in the staging queue.
+          # publish.ts publishes every package in dependency order with plain
+          # npm publish and the dist-tag from version.json. It never calls
+          # npm stage publish, so versions go live as soon as npm accepts them.
           bun scripts/publish.ts
