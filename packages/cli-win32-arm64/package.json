@@ -1,6 +1,6 @@
 {
   "name": "flexui-cli-windows-arm64",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0",
   "description": "FlexUI 2.0 compiler binary for Windows ARM64",
   "license": "MIT",
   "os": [

@@ -7,6 +7,26 @@ body, so every release needs an entry here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-11-27
+
+FlexUI 2.0 is out, installable with one command.
+
+### Added
+
+- `flexui-v2` installs the compiler and the matching platform binary with a
+  single `npm install flexui-v2` (or `npm install -g flexui-v2`). npm picks the
+  binary package from its `os` and `cpu` fields, so Windows, Linux and macOS on
+  x64 or ARM64 all resolve to the right executable.
+- Every npm package ships its own README, and the repository README carries a
+  complete installation guide.
+
+### Fixed
+
+- Framework packages import `flexui-runtime` under its published name.
+- The wrapper also finds a platform package installed beside the compiler, which
+  covers nested and global installs.
+- CI validates package contents and publishable tarballs before a release.
+
 ## [2.0.0-alpha.3] - 2026-11-27
 
 One command to install everything.

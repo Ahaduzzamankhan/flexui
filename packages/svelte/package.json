@@ -1,6 +1,6 @@
 {
   "name": "flexui-svelte",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0",
   "description": "Svelte actions for FlexUI interactive components",
   "license": "MIT",
   "type": "module",
@@ -22,7 +22,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "flexui-runtime": "2.0.0-alpha.3"
+    "flexui-runtime": "2.0.0"
   },
   "peerDependencies": {
     "svelte": ">=4.0.0"

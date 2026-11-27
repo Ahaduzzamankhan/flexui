@@ -1,6 +1,6 @@
 {
   "name": "flexui-cli-darwin-x64",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0",
   "description": "FlexUI 2.0 compiler binary for macOS x64",
   "license": "MIT",
   "os": [

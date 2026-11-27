@@ -1,6 +1,6 @@
 {
   "name": "flexui-vite",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0",
   "description": "Vite plugin that compiles FlexUI stylesheets for dev and build",
   "license": "MIT",
   "type": "module",

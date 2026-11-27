@@ -1,6 +1,6 @@
 {
   "name": "flexui-runtime",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0",
   "description": "Optional zero-dependency browser runtime for FlexUI components",
   "license": "MIT",
   "type": "module",

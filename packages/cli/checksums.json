@@ -1,8 +1,8 @@
 {
-  "win32-x64": { "file": "flexui.exe", "sha256": "50e80181832065a945bf00c0c4ccc8d009d227c9affd038ade4402d1833d6e69", "version": "2.0.0-alpha.3" },
-  "win32-arm64": { "file": "flexui.exe", "sha256": "b55d59d4eb0daa468e304d03c5299fff9d263222ec10da561bd10562b396aff0", "version": "2.0.0-alpha.3" },
-  "linux-x64": { "file": "flexui", "sha256": "9c9ba43e6953712949830de80735a3c0c9e73befcfe1f222bcb510d679303acd", "version": "2.0.0-alpha.3" },
-  "linux-arm64": { "file": "flexui", "sha256": "bd85b53915725cb27adc7df3629668acb5c9c49637574b6f3a8f6326f92e19b6", "version": "2.0.0-alpha.3" },
-  "darwin-x64": { "file": "flexui", "sha256": "f86e5631866027313685d0deb459726ffd99ab9635305986e6c9e8b2b8155549", "version": "2.0.0-alpha.3" },
-  "darwin-arm64": { "file": "flexui", "sha256": "bf39a07188d0065f3c83858b12ca77b60095143b7c41c661871c084e8a63248e", "version": "2.0.0-alpha.3" }
+  "win32-x64": { "file": "flexui.exe", "sha256": "975f4209cdc59aec43ed79661c5a9326db413b43668c57bb557f25b40bb3fd33", "version": "2.0.0" },
+  "win32-arm64": { "file": "flexui.exe", "sha256": "a90f6b6c0d82466e773a46c7795f4fa12247551631aa5cb14dde674772eda813", "version": "2.0.0" },
+  "linux-x64": { "file": "flexui", "sha256": "23731b18a08417479244917938e41c82d9d1b713bc337b2f2c408e85cd197780", "version": "2.0.0" },
+  "linux-arm64": { "file": "flexui", "sha256": "f6315aa926c7cf978e6008bf1d5d2075eec65f95345ee82addd8127da3209618", "version": "2.0.0" },
+  "darwin-x64": { "file": "flexui", "sha256": "e9ec2941f241bb8dcfaab5951bccb4e7c11ef29f62e98d8e2a76f23611d0a1b1", "version": "2.0.0" },
+  "darwin-arm64": { "file": "flexui", "sha256": "55130cf10759544ee3a1bf08ae899c678d10a04a1416d1bc88783e54ec574790", "version": "2.0.0" }
 }
