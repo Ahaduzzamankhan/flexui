@@ -1,0 +1,35 @@
+{
+  "name": "flexui-v2",
+  "version": "2.0.0-alpha.3",
+  "description": "One-command FlexUI 2.0 installer: brings in the compiler and the binary that matches your OS and CPU",
+  "license": "MIT",
+  "homepage": "https://github.com/Ahaduzzamankhan/flexui",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ahaduzzamankhan/flexui.git"
+  },
+  "keywords": [
+    "flexui",
+    "css",
+    "utility-first",
+    "compiler",
+    "installer"
+  ],
+  "files": [
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "flexui-compiler": "2.0.0-alpha.3"
+  },
+  "optionalDependencies": {
+    "flexui-cli-windows-x64": "2.0.0-alpha.3",
+    "flexui-cli-windows-arm64": "2.0.0-alpha.3",
+    "flexui-cli-linux-x64": "2.0.0-alpha.3",
+    "flexui-cli-linux-arm64": "2.0.0-alpha.3",
+    "flexui-cli-darwin-x64": "2.0.0-alpha.3",
+    "flexui-cli-darwin-arm64": "2.0.0-alpha.3"
+  }
+}

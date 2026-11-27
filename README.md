@@ -23,20 +23,29 @@ native binary, so Go is not part of the setup.
 
 **Requirements:** Node.js 18 or newer, or Bun 1.1 or newer.
 
-### Add the compiler
+### One command
+
+```bash
+npm install flexui-v2
+```
+
+`flexui-v2` installs the compiler and the binary for your machine in one step.
+npm picks the right platform package from its `os` and `cpu` fields, so Windows,
+Linux and macOS — on x64 or ARM64 — all work without a platform choice:
+
+```bash
+npm install --save-dev flexui-v2     # project
+npm install -g flexui-v2             # global `flexui` command
+pnpm add -D flexui-v2
+yarn add -D flexui-v2
+bun add -d flexui-v2
+```
+
+When you only want the compiler inside one project, `flexui-compiler` is the
+same thing without the umbrella package:
 
 ```bash
 npm install --save-dev flexui-compiler
-```
-
-That installs the `flexui` command together with the binary for your machine —
-Windows, Linux or macOS, on x64 or ARM64. pnpm, Yarn and Bun resolve the same
-packages:
-
-```bash
-pnpm add -D flexui-compiler
-yarn add -D flexui-compiler
-bun add -d flexui-compiler
 ```
 
 ### Create a project
@@ -44,6 +53,8 @@ bun add -d flexui-compiler
 ```bash
 npx flexui init
 ```
+
+With a global install, drop `npx` and call `flexui init` directly.
 
 `init` writes `flexui.config.json` and an entry stylesheet. Send the `content`
 globs at your source files, then compile:

@@ -55,7 +55,9 @@ function publishOrder(): string[] {
     .filter((entry) => entry.startsWith("cli-"))
     .sort()
     .map((entry) => join(PACKAGES, entry));
-  const rest = ["runtime", "react", "vue", "svelte", "vite-plugin", "cli"].map((entry) => join(PACKAGES, entry));
+  const rest = ["runtime", "react", "vue", "svelte", "vite-plugin", "cli", "installer"].map((entry) =>
+    join(PACKAGES, entry),
+  );
   return [...platform, ...rest];
 }
 
@@ -72,7 +74,9 @@ function verify(path: string, version: string): Manifest {
   }
   const needed = [join(path, "dist", "index.js"), join(path, "dist", "index.d.ts")];
   const isPlatform = manifest.name?.startsWith("flexui-cli-") ?? false;
-  if (!isPlatform && !needed.every((file) => existsSync(file))) {
+  // The installer only carries manifests and documentation.
+  const isInstaller = manifest.name === "flexui-v2";
+  if (!isPlatform && !isInstaller && !needed.every((file) => existsSync(file))) {
     fail(`${manifest.name} is missing build output; run build:js, build:runtime and build:integrations`);
   }
   if (manifest.name === "flexui-compiler" && !existsSync(join(path, "checksums.json"))) {

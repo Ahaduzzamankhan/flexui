@@ -32,7 +32,7 @@ import (
 // with -ldflags "-X .../internal/compiler.Version=<version>"; the default below
 // keeps `go run` and `go build` working, and TestVersionMatchesVersionFile fails
 // if the two ever drift apart.
-var Version = "2.0.0-alpha.2"
+var Version = "2.0.0-alpha.3"
 
 // Banner is the comment written at the top of generated stylesheets.
 var Banner = "FlexUI " + Version + " - generated stylesheet. Do not edit by hand."

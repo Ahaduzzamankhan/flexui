@@ -1,6 +1,6 @@
 {
   "name": "flexui-cli-darwin-arm64",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-alpha.3",
   "description": "FlexUI 2.0 compiler binary for macOS ARM64",
   "license": "MIT",
   "os": [

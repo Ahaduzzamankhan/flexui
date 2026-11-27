@@ -96,6 +96,9 @@ function candidatePaths(key: string): string[] {
   } catch {
     // The optional platform package is not installed for this platform.
   }
+  // Nested installs (a package that depends on flexui-compiler) keep the
+  // platform package one level above the compiler.
+  paths.push(join(__dirname, "..", "..", info.pkg, info.binary));
   paths.push(join(__dirname, "..", "binaries", key, info.binary));
   return paths;
 }
