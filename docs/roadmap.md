@@ -1,97 +1,108 @@
 # Roadmap
 
-Phases follow the product specification. A phase is only marked complete when it
-is implemented, tested and documented — no placeholder features.
+Phases follow the product specification. A phase is marked complete when it is
+implemented, tested and documented; nothing here is a placeholder.
 
 ## Phase 1 — Compiler foundation ✅
 
 - Go module, monorepo layout, zero third-party dependencies.
 - CLI: `build`, `watch`, `inspect`, `init`, `clean`, `version`.
-- Scanner with `**` globs and build-directory pruning.
-- Markup and script extractors built on state machines.
-- Bracket-aware candidate parser, AST/IR, utility registry (≈300 utilities),
-  variant resolver, generator, optimizer.
-- Content-addressed cache, polling watch mode, deterministic output.
+- Scanner with `**` globs and build-directory pruning; markup and script
+  extractors built on state machines.
+- Bracket-aware candidate parser, AST/IR, utility registry, variant resolver,
+  generator, optimizer.
+- Deterministic output, content-addressed cache, polling watch mode.
 - Precompiled binaries for six platforms with checksums and an npm wrapper.
-- 90+ unit and integration assertions.
 
-## Phase 2 — Utility framework (partly done)
+## Phase 2 — Utility framework ✅
 
-Implemented in Phase 1 because the compiler needs real utilities to be
-verifiable: spacing, layout, flexbox, grid, sizing, position, colour, borders,
-effects, transforms, interaction, typography scales.
+Spacing, layout, flexbox, grid, sizing, position, colour, borders, effects,
+transforms, interaction, typography scales, multi-column (`columns-*`,
+`break-*`), logical placement (`place-self-*`, `place-content-*`) and semantic
+colour aliases that follow the active theme.
 
-Still open:
+Remaining gaps, tracked below: `divide-*` opacity modifiers and broader
+logical-property coverage for RTL-first layouts.
 
-- Split ratios (`columns-*`), multi-column utilities.
-- `divide` opacity and `place-*` completeness review.
-- Broader logical-property coverage for RTL-first layouts.
+## Phase 3 — Variant engine ✅
 
-## Phase 3 — Variant engine (partly done)
+Responsive breakpoints, `max-*` and arbitrary `min-[…]`/`max-[…]` ranges,
+interaction, state, structural, group/peer, accessibility, `dark`/`light`,
+`data-[…]`, `aria-[…]`, `has-[…]`, `supports-[…]`, arbitrary selectors, container
+queries, composition, configuration-defined custom variants and deterministic
+ordering.
 
-Implemented: responsive, interaction, state, structural, group/peer,
-accessibility, theme, `data-*`, `aria-*`, `has-*`, `supports-*`, arbitrary
-selectors, container queries, composition and deterministic ordering.
+Remaining gaps: layout presets (`presets/`: dashboard, sidebar, docs,
+e-commerce shells) and named group/peer targeting beyond a single name.
 
-Still open:
+## Phase 4 — Theme and typography engine ✅
 
-- Named group/peer targeting beyond a single name.
-- `max-*` and range breakpoint variants.
-- User-defined variants from configuration.
-- Layout presets (`presets/`): dashboard, sidebar, docs, e-commerce shells.
+- Every design token is emitted as a CSS custom property in `flexui.theme`.
+- Semantic roles (`--flexui-surface`, `--flexui-fg`, `--flexui-line`, …) drive
+  components and utilities, so theme changes need no rebuild.
+- Config overrides for colour, spacing, type, radius, shadow, opacity, z-index,
+  breakpoints, easing, duration, aspect ratio, max-width and container sizes.
+- Dark-mode strategies: `class` (default), `media` and `both`.
+- Local `@font-face` output and font-family/weight/line-height/letter-spacing
+  scales.
+- Reduced-motion strategy is configurable (`safe` / `off`).
 
-## Phase 4 — Theme and typography engine
+## Phase 5 — Animation engine ✅
 
-- Config-driven theme overrides (spacing, colour, type, radius, shadow,
-  breakpoints, animation tokens).
-- CSS custom property output for tokens, with runtime theme switching.
-- System theme (`prefers-color-scheme`) strategy alongside the class strategy.
-- Variable font and font-feature configuration, local font declarations.
-
-## Phase 5 — Animation engine
-
-- Built-in animations (fade, slide, zoom, rotate, bounce, ping, spin, shake,
-  wobble, float, shimmer, blur, flip).
-- Animation controls: duration, delay, iteration, direction, fill mode,
-  play state, easing, composition.
-- Custom and arbitrary keyframes with deduplication.
-- Staggered children, scroll-driven animations, view transitions where
-  supported.
-- Reduced-motion handling and cubic-bezier/spring presets.
+- 25 built-in animations (fade, slide, zoom, rotate, bounce, ping, spin, shake,
+  wobble, float, shimmer, blur, flip and directional slides).
+- Controls: duration, delay, easing, iteration, direction, fill mode, play state
+  and composition, plus `animate-none`.
+- Staggered children, view-timeline and scroll-timeline utilities, custom and
+  arbitrary keyframes from configuration, deduplicated `@keyframes`.
+- One-shot reduced-motion override and cubic-bezier/spring easing presets.
 
 ## Phase 6 — Component system ✅
 
-Foundation, forms, navigation, overlays, data display and complex patterns, each
-with semantic HTML, FlexUI CSS, accessible behaviour, responsive layout, theme
-support and documented customisation. Components do not require a large runtime;
-overlays progressively enhance.
+150+ built-in classes in `@layer flexui.components` for foundation, forms,
+navigation, overlays, data display and layout shells, emitted only when used.
 
-Implemented as plain classes in `@layer flexui.components`, emitted only when
-used: buttons, badges, cards, stats, avatars, forms, navigation, tabs, tables,
-timelines, trees, calendars, charts, dialogs, drawers, popovers, toasts, command
-palettes and layout shells. See [components](components.md).
+The component engine is open: `components` in `flexui.config.json` defines any
+number of components with base declarations, variants, parts, states and
+`extends` (custom or built-in), validated at load time and resolved through the
+same pipeline as built-ins. A custom component may replace a built-in of the
+same name. See [custom components](custom-components.md).
 
-## Phase 7 — Runtime and integrations
+## Phase 7 — Runtime and integrations ✅
 
-- ✅ Optional zero-dependency vanilla JS runtime, importable per module
-  (dialog, drawer, dropdown, popover, tabs, toast, command palette, focus
-  management, theme switching). See [runtime](runtime.md).
-- Vite plugin with incremental compilation and error reporting.
-- React, Vue and Svelte helpers where needed.
+- Optional zero-dependency ESM runtime: dialog, drawer, dropdown, popover, tabs,
+  toast, command palette, focus management, theme switching, zero-config
+  `flexui-runtime/auto` entry, and binder/getter APIs for framework wrappers.
+- Framework helpers: `flexui-react` hooks, `flexui-vue` composables and
+  `flexui-svelte` actions.
+- `flexui-vite` plugin for dev (watch) and build, with compiler error
+  reporting and Vite-native configuration.
 
-## Phase 8 — Optimisation and release
+## Phase 8 — Optimisation and release ✅
 
-- Per-file incremental compilation and cache pruning.
-- Keyframe deduplication and further CSS size work.
-- Benchmarks against other utility frameworks on realistic projects (cold,
-  warm, incremental build time; peak memory; binary, CSS and runtime size;
-  large-project scaling). No performance claim will be published before that.
-- npm publishing pipeline, release automation, documentation site.
+- Incremental builds: `.flexui/manifest.json` stores per-file size, mtime,
+  content hash and candidates, so a rebuild after one edit reads one file. The
+  manifest prunes deleted files, validates its version and is bypassed by
+  `--no-cache`. Measured in [benchmarks](benchmarks.md).
+- Whole-build cache plus deterministic output; keyframes are emitted once.
+- `version.json` is the single version source, resolved by `cmd/version` (Go) and
+  `scripts/version.ts` (npm scripts, tags, release notes).
+- GitHub Actions: CI (format, vet, tests, typecheck, cross-compiled binaries) and
+  a tag-driven release that builds binaries, attaches uniquely named assets,
+  writes the changelog as release notes, and publishes npm packages when
+  `NPM_TOKEN` is configured.
 
-## Known limitations today
+Remaining: comparison benchmarks against other frameworks on equivalent
+projects, a generated documentation site, and filesystem-event watch mode.
 
-- Filters do not compose; transforms do.
+## Known limitations
+
+- `filter` utilities (`blur-*`, `grayscale-*`) do not compose with each other;
+  transforms do, through CSS custom properties.
 - `ring` and `shadow` compose only through the shared `box-shadow` expression.
-- Watch mode polls (250 ms) rather than using filesystem events.
-- Dark mode is class-based only.
-- No layout preset package yet; the example uses utilities directly.
+- Watch mode polls every 250 ms rather than subscribing to filesystem events.
+- The incremental manifest trusts size + modification time; a rewrite that
+  preserves both is not detected (`--no-cache` bypasses it).
+- Warm and incremental builds still scan and stat every file; the numbers are
+  in [benchmarks](benchmarks.md).
+- No layout preset package yet; the examples compose utilities directly.

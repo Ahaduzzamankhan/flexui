@@ -3,16 +3,16 @@
 ## 1. Install
 
 ```bash
-npm install flexui
+npm install --save-dev flexui-compiler
 ```
 
 FlexUI is a native compiler. npm installs the binary for your platform through
-an optional dependency package (`@flexui/cli-<os>-<arch>`), so no Go toolchain
+an optional dependency package (`flexui-cli-<os>-<arch>`), so no Go toolchain
 and no install scripts are required. If optional dependencies are disabled in
 your environment, install the platform package directly:
 
 ```bash
-npm install @flexui/cli-linux-x64      # or win32-x64, darwin-arm64, ...
+npm install flexui-cli-linux-x64      # or win32-x64, darwin-arm64, ...
 ```
 
 You can always bypass resolution with `FLEXUI_BINARY=/path/to/flexui`.
@@ -20,7 +20,7 @@ You can always bypass resolution with `FLEXUI_BINARY=/path/to/flexui`.
 ## 2. Initialise
 
 ```bash
-npx flexui init
+npx flexui-compiler init
 ```
 
 This creates `flexui.config.json` and `src/styles.css`:
@@ -66,15 +66,15 @@ Existing files are never overwritten.
 ## 4. Build
 
 ```bash
-npx flexui build            # development build
-npx flexui build --minify   # production build
-npx flexui watch            # rebuild on change
+npx flexui-compiler build            # development build
+npx flexui-compiler build --minify   # production build
+npx flexui-compiler watch            # rebuild on change
 ```
 
 The build prints what it did:
 
 ```
-flexui 2.0.0-alpha.1
+flexui 2.0.0-alpha.2
   dist/flexui.css
   1 files -> 42 candidates -> 39 rules -> 18.6 kB
   24ms
@@ -82,7 +82,7 @@ flexui 2.0.0-alpha.1
 
 ## 5. Inspect
 
-`npx flexui inspect` prints every resolved rule, ordered exactly as it will be
+`npx flexui-compiler inspect` prints every resolved rule, ordered exactly as it will be
 emitted, without writing a file. This is the fastest way to understand why a
 class behaves the way it does:
 
@@ -112,11 +112,11 @@ For keyboard behaviour, focus restoration and theme switching, add the optional
 runtime:
 
 ```bash
-npm install @flexui/runtime
+npm install flexui-runtime
 ```
 
 ```ts
-import { init } from "@flexui/runtime";
+import { init } from "flexui-runtime";
 init();
 ```
 

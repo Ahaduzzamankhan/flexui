@@ -12,8 +12,8 @@
 .flexui/
 node_modules/
 
-# Compiled TypeScript (built by `tsc`, run automatically on install)
-packages/cli/dist/
+# Compiled TypeScript (built by `tsc` before packaging)
+packages/*/dist/
 
 # Cross-compiled binaries (built by scripts/build-binaries.sh for releases)
 packages/cli/binaries/

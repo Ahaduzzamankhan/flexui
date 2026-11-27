@@ -1,6 +1,6 @@
 {
-  "name": "@flexui/cli-linux-arm64",
-  "version": "2.0.0-alpha.1",
+  "name": "flexui-cli-linux-arm64",
+  "version": "2.0.0-alpha.2",
   "description": "FlexUI 2.0 compiler binary for Linux ARM64",
   "license": "MIT",
   "os": [
@@ -10,6 +10,7 @@
     "arm64"
   ],
   "files": [
-    "flexui"
+    "flexui",
+    "README.md"
   ]
 }

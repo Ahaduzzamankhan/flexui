@@ -7,6 +7,17 @@ body, so every release needs an entry here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0-alpha.2] - 2026-11-27
+
+Fixes npm packaging for the first alpha.
+
+### Fixed
+
+- The npm wrapper now resolves the Windows compiler from
+  `flexui-cli-windows-x64` and `flexui-cli-windows-arm64`. The first published
+  `flexui-compiler` tarball still asked for the old `win32` package names, so
+  `flexui` could not find its binary on Windows.
+
 ## [2.0.0-alpha.1] - 2026-11-26
 
 First public alpha. Everything listed is implemented, tested and documented;
@@ -39,19 +50,26 @@ nothing is a placeholder.
 - **Component system** — 150+ `fui-*` classes in `@layer flexui.components` for
   foundation, forms, navigation, overlays, data display and layout shells. Only
   classes used in scanned sources are emitted.
-- **Runtime** — optional zero-dependency ESM `@flexui/runtime` for dialogs,
+- **Custom component engine** — define any number of components in
+  `flexui.config.json` with base declarations, variants, parts, state selectors
+  and `extends` (custom or built-in). Definitions are validated at load time,
+  resolve through the same pipeline as built-ins, can replace a built-in of the
+  same name, and produce deterministic CSS.
+- **Runtime** — optional zero-dependency ESM `flexui-runtime` for dialogs,
   drawers, dropdowns, popovers, tabs, toasts, command palettes, focus trapping
-  and theme switching, with a zero-config `@flexui/runtime/auto` entry and
+  and theme switching, with a zero-config `flexui-runtime/auto` entry and
   framework-agnostic binder/getter APIs.
-- **Integrations** — `@flexui/vite` (build and watch, error reporting),
-  `@flexui/react` hooks, `@flexui/vue` composables and `@flexui/svelte` actions.
+- **Integrations** — `flexui-vite` (build and watch, error reporting),
+  `flexui-react` hooks, `flexui-vue` composables and `flexui-svelte` actions.
 - **Incremental builds** — `.flexui/manifest.json` records each file's size,
   modification time, content hash and extracted candidates, so a rebuild after
   one edit reads one file instead of the whole project. The manifest prunes
   deleted files, validates its own version, and is bypassed by `--no-cache`.
 - **Distribution** — precompiled binaries for Windows, Linux and macOS on x64 and
   ARM64 with SHA-256 checksums, resolved by a TypeScript npm wrapper that needs
-  no Go toolchain and runs no install scripts.
+  no Go toolchain and runs no install scripts. Release assets use unique
+  per-platform names, and npm packages publish in dependency order with an
+  explicit dist-tag for prereleases.
 - **Tooling** — `version.json` as the single version source, `bun run
   version:sync` / `version:check`, `scripts/release.ts` for tagged releases with
   binaries and changelog notes, and GitHub Actions CI and release workflows.

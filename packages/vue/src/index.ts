@@ -1,5 +1,5 @@
 /**
- * Vue bindings for `@flexui/runtime`.
+ * Vue bindings for `flexui-runtime`.
  *
  * Composables bind on mount and dispose on unmount, so Dialog/Dropdown state is
  * destroyed with the component that owns it instead of leaking listeners.
@@ -8,10 +8,10 @@
 
 import { onBeforeUnmount, onMounted, ref, shallowRef, type Ref, type ShallowRef } from "vue";
 
-import { bindDialog, type Dialog, type DialogOptions } from "@flexui/runtime/dialog";
-import { bindDropdown, type Dropdown, type DropdownOptions } from "@flexui/runtime/dropdown";
-import { bindPopover, type PopoverController, type PopoverOptions } from "@flexui/runtime/popover";
-import { bindTabs, type Tabs } from "@flexui/runtime/tabs";
+import { bindDialog, type Dialog, type DialogOptions } from "flexui-runtime/dialog";
+import { bindDropdown, type Dropdown, type DropdownOptions } from "flexui-runtime/dropdown";
+import { bindPopover, type PopoverController, type PopoverOptions } from "flexui-runtime/popover";
+import { bindTabs, type Tabs } from "flexui-runtime/tabs";
 import {
   getResolvedTheme,
   getTheme,
@@ -20,7 +20,7 @@ import {
   type ResolvedTheme,
   type ThemeChangeDetail,
   type ThemeMode,
-} from "@flexui/runtime/theme";
+} from "flexui-runtime/theme";
 
 export interface UseDialogResult {
   /** `ref` for the `<dialog>` element. */

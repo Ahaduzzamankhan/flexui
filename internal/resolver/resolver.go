@@ -23,6 +23,9 @@ type Options struct {
 	CustomVariants map[string]string
 	// CustomAnimations are user-defined @keyframes from configuration.
 	CustomAnimations map[string]animation.Definition
+	// CustomComponents are user-defined components from configuration. Their
+	// classes resolve in the components layer exactly like built-in ones.
+	CustomComponents []components.CustomComponent
 }
 
 // Resolver resolves candidates.
@@ -45,9 +48,15 @@ func NewWith(o Options) *Resolver {
 	if theme == nil {
 		theme = themes.Default()
 	}
+	comps, err := components.NewWithCustom(theme, o.CustomComponents)
+	if err != nil {
+		// Invalid definitions are rejected by the compiler before resolution, so
+		// this only guards direct library use; the built-in set stays available.
+		comps = components.New(theme)
+	}
 	return &Resolver{
 		utils: utilities.New(theme),
-		comps: components.New(theme),
+		comps: comps,
 		anims: animation.New(o.CustomAnimations),
 		vars: variants.NewWith(variants.Options{
 			Theme:    theme,

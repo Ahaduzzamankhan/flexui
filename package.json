@@ -1,7 +1,7 @@
 {
   "name": "flexui-monorepo",
   "private": true,
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "FlexUI 2.0 monorepo: Go compiler, TypeScript npm CLI and examples",
   "license": "MIT",
   "workspaces": [
@@ -22,6 +22,8 @@
     "version:sync": "bun scripts/version.ts sync",
     "release": "bun scripts/release.ts",
     "release:publish": "bun scripts/release.ts --publish",
+    "publish:npm": "bun scripts/publish.ts",
+    "publish:npm:dry-run": "bun scripts/publish.ts --dry-run",
     "test": "go test ./...",
     "vet": "go vet ./..."
   },

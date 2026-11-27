@@ -55,7 +55,7 @@ export class CommandPalette {
     );
     const list = element.querySelector<HTMLElement>("[data-fui-command-list], [role='listbox']");
     if (!input || !list) {
-      throw new Error("@flexui/runtime: command palette needs an input and a list");
+      throw new Error("flexui-runtime: command palette needs an input and a list");
     }
 
     this.input = input;

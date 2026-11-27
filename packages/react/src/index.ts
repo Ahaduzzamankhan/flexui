@@ -1,5 +1,5 @@
 /**
- * React bindings for `@flexui/runtime`.
+ * React bindings for `flexui-runtime`.
  *
  * The hooks own the controller lifecycle: they bind on mount, dispose on
  * unmount, and mirror the controller's open state into React state so a
@@ -9,10 +9,10 @@
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 
-import { bindDialog, type Dialog, type DialogOptions } from "@flexui/runtime/dialog";
-import { bindDropdown, type Dropdown, type DropdownOptions } from "@flexui/runtime/dropdown";
-import { bindPopover, type PopoverController, type PopoverOptions } from "@flexui/runtime/popover";
-import { bindTabs, type Tabs } from "@flexui/runtime/tabs";
+import { bindDialog, type Dialog, type DialogOptions } from "flexui-runtime/dialog";
+import { bindDropdown, type Dropdown, type DropdownOptions } from "flexui-runtime/dropdown";
+import { bindPopover, type PopoverController, type PopoverOptions } from "flexui-runtime/popover";
+import { bindTabs, type Tabs } from "flexui-runtime/tabs";
 import {
   getResolvedTheme,
   getTheme,
@@ -21,7 +21,7 @@ import {
   type ResolvedTheme,
   type ThemeChangeDetail,
   type ThemeMode,
-} from "@flexui/runtime/theme";
+} from "flexui-runtime/theme";
 
 /**
  * Mirrors a controller's open state into React state. The ref is read inside

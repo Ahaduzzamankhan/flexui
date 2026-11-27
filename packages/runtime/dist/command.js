@@ -26,7 +26,7 @@ export class CommandPalette {
         const input = element.querySelector("[data-fui-command-input], input[role='combobox'], input");
         const list = element.querySelector("[data-fui-command-list], [role='listbox']");
         if (!input || !list) {
-            throw new Error("@flexui/runtime: command palette needs an input and a list");
+            throw new Error("flexui-runtime: command palette needs an input and a list");
         }
         this.input = input;
         this.list = list;

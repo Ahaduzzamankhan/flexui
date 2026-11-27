@@ -50,6 +50,46 @@ type Config struct {
 
 	// Fonts declares local @font-face rules.
 	Fonts []FontFaceConfig `json:"fonts"`
+
+	// Components defines user components. Each key becomes a `fui-<key>` class
+	// with optional variants, parts and state selectors, so projects are not
+	// limited to the built-in component set.
+	Components map[string]ComponentConfig `json:"components"`
+}
+
+// ComponentConfig defines one user component.
+//
+//	"components": {
+//	  "alert": {
+//	    "extends": "card",
+//	    "base": { "display": "flex", "gap": "0.75rem" },
+//	    "variants": { "success": { "color": "var(--flexui-success)" } },
+//	    "parts": { "title": { "font-weight": "600" } },
+//	    "states": { ":hover": { "border-color": "var(--flexui-accent)" } }
+//	  }
+//	}
+//
+// A component produces these classes:
+//
+//	fui-<name>                base declarations and states
+//	fui-<name>--<variant>     variant declarations
+//	fui-<name>-<part>         part declarations
+//
+// extends may name another custom component or a built-in one. Built-in
+// parents contribute their own element declarations; their parts and states are
+// not inherited.
+type ComponentConfig struct {
+	// Extends inherits declarations from another component.
+	Extends string `json:"extends"`
+	// Base declarations apply to the fui-<name> class.
+	Base map[string]string `json:"base"`
+	// Variants become fui-<name>--<variant> classes.
+	Variants map[string]map[string]string `json:"variants"`
+	// Parts become fui-<name>-<part> classes.
+	Parts map[string]map[string]string `json:"parts"`
+	// States apply to the base class, keyed by a selector suffix such as
+	// ":hover", "[aria-selected='true']" or " > svg".
+	States map[string]map[string]string `json:"states"`
 }
 
 // ThemeConfig is the theme override block. Every scale is optional.
@@ -194,6 +234,9 @@ func Load(path string) (Config, error) {
 	case "safe", "off":
 	default:
 		return cfg, fmt.Errorf("parse config %s: reducedMotion must be safe or off, got %q", path, cfg.ReducedMotion)
+	}
+	if err := validateComponents(path, cfg.Components); err != nil {
+		return cfg, err
 	}
 	return cfg, nil
 }

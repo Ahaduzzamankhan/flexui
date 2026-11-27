@@ -1,6 +1,6 @@
 {
-  "name": "flexui",
-  "version": "2.0.0-alpha.1",
+  "name": "flexui-compiler",
+  "version": "2.0.0-alpha.2",
   "description": "FlexUI 2.0 - a utility-first CSS compiler written in Go, distributed as precompiled native binaries",
   "license": "MIT",
   "homepage": "https://github.com/Ahaduzzamankhan/flexui",
@@ -41,11 +41,11 @@
     "prepare": "tsc -p tsconfig.json"
   },
   "optionalDependencies": {
-    "@flexui/cli-win32-x64": "2.0.0-alpha.1",
-    "@flexui/cli-win32-arm64": "2.0.0-alpha.1",
-    "@flexui/cli-linux-x64": "2.0.0-alpha.1",
-    "@flexui/cli-linux-arm64": "2.0.0-alpha.1",
-    "@flexui/cli-darwin-x64": "2.0.0-alpha.1",
-    "@flexui/cli-darwin-arm64": "2.0.0-alpha.1"
+    "flexui-cli-windows-x64": "2.0.0-alpha.2",
+    "flexui-cli-windows-arm64": "2.0.0-alpha.2",
+    "flexui-cli-linux-x64": "2.0.0-alpha.2",
+    "flexui-cli-linux-arm64": "2.0.0-alpha.2",
+    "flexui-cli-darwin-x64": "2.0.0-alpha.2",
+    "flexui-cli-darwin-arm64": "2.0.0-alpha.2"
   }
 }

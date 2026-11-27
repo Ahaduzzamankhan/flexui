@@ -1,52 +1,79 @@
-# @flexui/runtime
+# flexui-runtime
 
-Optional zero-dependency browser runtime for [FlexUI](https://github.com/Ahaduzzamankhan/flexui) components. The CSS works without it; this package adds keyboard behaviour, focus management, ARIA state and DOM events on top of native `<dialog>` and the popover API.
+The optional browser runtime for FlexUI components. It adds keyboard
+behaviour, focus management, ARIA state and DOM events on top of native
+`<dialog>`, the popover API and your existing markup. The CSS works on its own;
+this package is what makes the interactive components feel finished.
+
+Zero dependencies, ESM, about as small as a runtime can be.
 
 ```bash
-npm install @flexui/runtime
+npm install flexui-runtime
 ```
 
-```ts
-import { init } from "@flexui/runtime";
+```js
+import { init } from "flexui-runtime";
 
-const dispose = init();
+const cleanup = init();
 ```
 
-## Features
+Call `init()` once per page. It scans the document for the data attributes below
+and returns a cleanup function that unbinds everything it attached.
 
-- Dialogs and drawers: backdrop dismissal, Escape, scroll locking, focus trap and focus restoration.
-- Dropdown menus: arrow/Home/End navigation, roving focus, outside dismissal.
-- Popovers: native popover API with viewport-aware positioning and a fallback.
-- Tabs: roving tabindex, automatic activation, horizontal/vertical orientation.
-- Toasts: polite live region, four-toast cap, pause on hover/focus, sticky option.
-- Command palette: Ctrl/Cmd+K, multi-term filtering, active descendant, events.
-- Theme switching: light/dark/system, `localStorage`, `prefers-color-scheme`.
-- Focus helpers: `focusable`, `focusFirst`, `trapFocus`.
+## What it handles
 
-## Markup contracts
+- **Dialogs and drawers** — backdrop dismissal, Escape, scroll locking, focus
+  trap and focus restoration to the element that opened them.
+- **Dropdown menus** — arrow, Home and End navigation, roving focus, dismissal
+  on outside click.
+- **Popovers** — native popover API with viewport-aware positioning.
+- **Tabs** — roving tabindex, automatic activation, horizontal and vertical
+  orientation.
+- **Toasts** — polite live region, a four-toast cap, pause on hover or focus, and
+  a sticky option.
+- **Command palette** — Ctrl/Cmd+K, multi-term filtering, active descendant and
+  events.
+- **Theme switching** — light, dark and system, with `localStorage` and
+  `prefers-color-scheme`.
+- **Focus helpers** — `focusable`, `focusFirst` and `trapFocus` for your own
+  widgets.
+
+## Markup
 
 | Feature | Markup |
 | --- | --- |
-| Dialog | `<dialog class="fui-dialog" data-fui-dialog>` with `data-fui-open="#id"` / `data-fui-close` |
+| Dialog | `<dialog class="fui-dialog" data-fui-dialog>`, opened with `data-fui-open="#id"` and closed with `data-fui-close` |
 | Drawer | `<dialog class="fui-drawer" data-fui-drawer data-fui-side="right">` |
-| Dropdown | `data-fui-dropdown="#menu"` + `role="menu"` items |
-| Popover | `data-fui-popover="#panel"` + `popover` panel |
-| Tabs | `data-fui-tabs` + `role="tablist"` / `tab` / `tabpanel` |
+| Dropdown | `data-fui-dropdown="#menu"` on the trigger, `role="menu"` on the items |
+| Popover | `data-fui-popover="#panel"` on the trigger, `popover` on the panel |
+| Tabs | `data-fui-tabs` with `role="tablist"`, `role="tab"` and `role="tabpanel"` |
 | Toast | `toast({ title, description, variant, duration })` |
-| Command palette | `data-fui-command` + input/list/item attributes |
+| Command palette | `data-fui-command` plus the input, list and item attributes |
 | Theme | `data-fui-theme-set="light\|dark\|system"` or `data-fui-theme-toggle` |
 
-`init(root?)` returns a cleanup function and is safe to call once per page. Every feature is also exported from its own entry point:
+## Per-feature entry points
 
-```ts
-import { initDialogs } from "@flexui/runtime/dialog";
-import { toast } from "@flexui/runtime/toast";
-import { setTheme } from "@flexui/runtime/theme";
+Importing the whole runtime is convenient; importing one module keeps the rest
+out of your bundle. Every feature has its own entry:
+
+```js
+import { initDialogs } from "flexui-runtime/dialog";
+import { initDrawers } from "flexui-runtime/drawer";
+import { initDropdowns } from "flexui-runtime/dropdown";
+import { initPopovers } from "flexui-runtime/popover";
+import { initTabs } from "flexui-runtime/tabs";
+import { toast } from "flexui-runtime/toast";
+import { initCommand } from "flexui-runtime/command";
+import { setTheme, getTheme, initTheme } from "flexui-runtime/theme";
+import { focusFirst, trapFocus } from "flexui-runtime/focus";
 ```
+
+`flexui-runtime/auto` is a side-effect entry that initialises everything as soon
+as the DOM is ready.
 
 ## Events
 
-All events bubble and are cancelable.
+Every event bubbles and is cancelable.
 
 | Event | Detail |
 | --- | --- |
@@ -58,14 +85,23 @@ All events bubble and are cancelable.
 | `fui:command` | `{ value, label, item, palette }` |
 | `fui:themechange` | `{ mode, resolved }` |
 
-## Docs
+## Theming
 
-The full guide lives in [docs/runtime.md](https://github.com/Ahaduzzamankhan/flexui/blob/main/docs/runtime.md).
+```js
+import { setTheme, getTheme } from "flexui-runtime/theme";
 
-## Build
-
-```bash
-bun run build:runtime
+setTheme("dark");          // "light" | "dark" | "system"
+getTheme();                // { mode: "dark", resolved: "dark" }
 ```
 
-Output is ESM plus declarations in `dist/`. MIT licensed.
+Theme state is stored under a configurable key, so several sites on one origin
+can keep independent preferences.
+
+## Documentation
+
+The full guide, including every option and the complete event list, lives in
+[docs/runtime.md](https://github.com/Ahaduzzamankhan/flexui/blob/main/docs/runtime.md).
+
+## License
+
+MIT

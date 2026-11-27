@@ -185,7 +185,7 @@ function startWatcher(
  * ```ts
  * // vite.config.ts
  * import { defineConfig } from "vite";
- * import { flexui } from "@flexui/vite";
+ * import { flexui } from "flexui-vite";
  *
  * export default defineConfig({ plugins: [flexui({ minify: true })] });
  * ```

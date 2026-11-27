@@ -1,9 +1,9 @@
 /**
- * Svelte actions for `@flexui/runtime`.
+ * Svelte actions for `flexui-runtime`.
  *
  * ```svelte
  * <script>
- *   import { dialog, dropdown, tabs } from "@flexui/svelte";
+ *   import { dialog, dropdown, tabs } from "flexui-svelte";
  * </script>
  *
  * <dialog class="fui-dialog" use:dialog={{ closeOnBackdrop: true }}>…</dialog>
@@ -16,10 +16,10 @@
  * Parameters are read once, when the action runs.
  */
 
-import { bindDialog, type DialogOptions } from "@flexui/runtime/dialog";
-import { bindDropdown, type DropdownOptions } from "@flexui/runtime/dropdown";
-import { bindPopover, type PopoverOptions } from "@flexui/runtime/popover";
-import { bindTabs } from "@flexui/runtime/tabs";
+import { bindDialog, type DialogOptions } from "flexui-runtime/dialog";
+import { bindDropdown, type DropdownOptions } from "flexui-runtime/dropdown";
+import { bindPopover, type PopoverOptions } from "flexui-runtime/popover";
+import { bindTabs } from "flexui-runtime/tabs";
 
 /** The shape Svelte uses for an action's return value. */
 export interface Action<Params = undefined> {

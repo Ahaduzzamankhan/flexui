@@ -3,7 +3,6 @@ name: Release
 on:
   push:
     tags: ["v*"]
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -69,17 +68,11 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      - name: build binaries
+      - name: build binaries with the version.json version
         run: bash scripts/build-binaries.sh
 
-      - name: write release notes from CHANGELOG.md
-        run: bun scripts/version.ts notes --out dist-release/RELEASE_NOTES.md
-
-      - name: checksums
-        run: |
-          mkdir -p dist-release
-          bun scripts/release.ts --skip-build > dist-release/release-log.txt
-          cat dist-release/release-log.txt
+      - name: stage assets, notes and checksums
+        run: bun scripts/release.ts --skip-build
 
       - name: create GitHub release
         env:
@@ -89,22 +82,26 @@ jobs:
           gh release create "$tag" \
             --title "FlexUI ${tag#v}" \
             --notes-file dist-release/RELEASE_NOTES.md \
-            packages/cli-*/flexui \
-            packages/cli-*/flexui.exe \
-            packages/cli/checksums.json \
+            dist-release/assets/* \
             dist-release/SHA256SUMS
 
   npm:
     name: Publish npm packages
     needs: release
     runs-on: ubuntu-latest
-    if: ${{ secrets.NPM_TOKEN != '' }}
+    permissions:
+      contents: read
+      # Trusted publishing exchanges this for a short-lived npm credential and
+      # attaches provenance to every tarball.
+      id-token: write
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
       - uses: actions/setup-go@v5
@@ -116,31 +113,57 @@ jobs:
         with:
           bun-version: latest
 
-      - run: bun install --frozen-lockfile
-      - run: bash scripts/build-binaries.sh
-      - run: bun run build:js
-      - run: bun run build:runtime
-      - run: bun run build:integrations
+      # npm stage publish introduced a review queue; direct publishing needs a
+      # CLI that understands both OIDC and plain npm publish.
+      - name: use a current npm CLI
+        run: npm install --global npm@^11.15.0
 
-      - name: publish platform packages first
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: choose the npm credential
+        id: auth
         run: |
-          for dir in packages/cli-*/; do
-            npm publish "$dir" --access public --ignore-scripts
-          done
+          if [ -n "${NODE_AUTH_TOKEN}" ]; then
+            echo "mode=token" >> "$GITHUB_OUTPUT"
+          elif [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL}" ]; then
+            echo "mode=oidc" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=none" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: publish runtime and integrations
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: no npm credential configured
+        if: steps.auth.outputs.mode == 'none'
+        run: echo "Neither NPM_TOKEN nor OIDC is available; the GitHub release was created without npm packages."
+
+      - name: install
+        if: steps.auth.outputs.mode != 'none'
+        run: bun install --frozen-lockfile
+
+      - name: version consistency
+        if: steps.auth.outputs.mode != 'none'
+        run: bun run version:check
+
+      - name: build binaries and checksums
+        if: steps.auth.outputs.mode != 'none'
+        run: bash scripts/build-binaries.sh
+
+      - name: build TypeScript output
+        if: steps.auth.outputs.mode != 'none'
         run: |
-          npm publish packages/runtime --access public --ignore-scripts
-          npm publish packages/react --access public --ignore-scripts
-          npm publish packages/vue --access public --ignore-scripts
-          npm publish packages/svelte --access public --ignore-scripts
-          npm publish packages/vite-plugin --access public --ignore-scripts
+          bun run build:js
+          bun run build:runtime
+          bun run build:integrations
 
-      - name: publish the CLI last
+      - name: publish straight to the registry
+        if: steps.auth.outputs.mode != 'none'
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish packages/cli --access public --ignore-scripts
+          AUTH_MODE: ${{ steps.auth.outputs.mode }}
+        run: |
+          if [ "$AUTH_MODE" = "oidc" ]; then
+            unset NODE_AUTH_TOKEN
+            echo "Publishing with trusted publishing (OIDC); provenance is generated automatically."
+          else
+            echo "Publishing with the configured NPM_TOKEN."
+          fi
+          # publish.ts runs plain npm publish for every package in dependency
+          # order. It never calls npm stage publish, so versions go live as soon
+          # as npm accepts them instead of waiting in the staging queue.
+          bun scripts/publish.ts

@@ -4,7 +4,7 @@
  *   bun scripts/version.ts show      # resolved version info as JSON
  *   bun scripts/version.ts check     # exit 1 if any package or changelog drifts
  *   bun scripts/version.ts sync      # rewrite package versions from version.json
- *   bun scripts/version.ts tag       # print the git tag (v2.0.0-alpha.1)
+ *   bun scripts/version.ts tag       # print the git tag (v2.0.0-alpha.2)
  *   bun scripts/version.ts notes     # print the CHANGELOG section for this version
  *   bun scripts/version.ts notes --out dist-release/RELEASE_NOTES.md
  *
@@ -49,7 +49,7 @@ export function readVersion(root: string = process.cwd()): VersionInfo {
   return { name: data.name, version: data.version, channel: data.channel ?? "" };
 }
 
-/** Returns a git tag name such as v2.0.0-alpha.1. */
+/** Returns a git tag name such as v2.0.0-alpha.2. */
 export function tagName(info: VersionInfo): string {
   return `v${info.version}`;
 }
@@ -102,7 +102,7 @@ export function checkVersions(root: string = process.cwd()): ManifestIssue[] {
           continue;
         }
         // Workspace-internal FlexUI packages are pinned to the release version.
-        if (name.startsWith("@flexui/") || name === "flexui") {
+        if (name.startsWith("flexui-") || name.startsWith("@flexui/")) {
           if (/^[0-9]/.test(range)) {
             issues.push({ file: `${path}#${field}.${name}`, found: range, expected: info.version });
           }

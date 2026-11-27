@@ -3,7 +3,7 @@
  *
  *   bun scripts/release.ts                 # build + prepare dist-release, no tag
  *   bun scripts/release.ts --publish       # also tag, push and create the GitHub release
- *   bun scripts/release.ts --skip-build    # reuse existing packages/cli-*/ binaries
+ *   bun scripts/release.ts --skip-build    # reuse existing packages/cli-<platform>/ binaries
  *
  * The version comes from version.json (see scripts/version.ts). Release notes
  * are the CHANGELOG.md section for that version, so a release cannot be
@@ -11,8 +11,8 @@
  */
 
 import { spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { copyFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
 
 import { checkVersions, notesFor, readVersion, tagName, type VersionInfo } from "./version.js";
 
@@ -51,23 +51,39 @@ function capture(command: string, args: readonly string[]): { status: number; st
   return { status: result.status ?? 1, stdout: (result.stdout ?? "").trim() };
 }
 
-/** Every cross-compiled binary produced by scripts/build-binaries.sh. */
-function binaryAssets(): string[] {
+/**
+ * Stages every cross-compiled binary under dist-release/assets with a unique
+ * name. GitHub releases identify assets by file name only, so six binaries all
+ * called `flexui` would overwrite each other.
+ */
+function stageAssets(): string[] {
+  const dir = join(OUT, "assets");
+  mkdirSync(dir, { recursive: true });
+
   const assets: string[] = [];
-  for (const entry of readdirSync(ROOT)) {
-    if (!entry.startsWith("cli-") || !entry.includes("-")) {
+  for (const entry of readdirSync(join(ROOT, "packages")).sort()) {
+    if (!entry.startsWith("cli-")) {
       continue;
     }
-    const dir = join(ROOT, "packages", entry);
-    for (const name of readdirSync(dir)) {
-      if (name === "flexui" || name === "flexui.exe") {
-        assets.push(join("packages", entry, name));
+    const platform = entry.slice("cli-".length);
+    const source = join(ROOT, "packages", entry);
+    for (const name of readdirSync(source).sort()) {
+      if (name !== "flexui" && name !== "flexui.exe") {
+        continue;
       }
+      const suffix = name.endsWith(".exe") ? ".exe" : "";
+      const target = join(dir, `flexui-${platform}${suffix}`);
+      copyFileSync(join(source, name), target);
+      assets.push(target);
     }
   }
   if (assets.length === 0) {
     fail("no binaries found; run `bash scripts/build-binaries.sh` first");
   }
+
+  const checksums = join(dir, "checksums.json");
+  copyFileSync(join(ROOT, "packages", "cli", "checksums.json"), checksums);
+  assets.push(checksums);
   return assets.sort();
 }
 
@@ -94,7 +110,7 @@ function writeNotes(info: VersionInfo, notes: string, assets: readonly string[])
     "- `checksums.json` and `SHA256SUMS` with the SHA-256 of every binary",
     "",
     "```",
-    ...assets.map((asset) => asset.replace(/\\/g, "/")),
+    ...assets.map((asset) => basename(asset)),
     "```",
     "",
   ].join("\n");
@@ -127,7 +143,7 @@ function main(): void {
     run("bash", ["scripts/build-binaries.sh"]);
   }
 
-  const assets = binaryAssets();
+  const assets = stageAssets();
   const sums = writeChecksumFile();
   const notesPath = writeNotes(info, notes, assets);
 
@@ -163,8 +179,7 @@ function main(): void {
     fail(`tag ${tag} was pushed but the GitHub CLI (gh) is not installed, so no release was created`);
   }
 
-  const releaseAssets = [...assets, "packages/cli/checksums.json", sums];
-  run("gh", ["release", "create", tag, "--title", `FlexUI ${info.version}`, "--notes-file", notesPath, ...releaseAssets]);
+  run("gh", ["release", "create", tag, "--title", `FlexUI ${info.version}`, "--notes-file", notesPath, ...assets, sums]);
 
   console.log(`\nreleased ${tag}`);
 }

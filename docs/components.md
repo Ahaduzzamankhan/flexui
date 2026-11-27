@@ -152,3 +152,13 @@ element:
 
 Because utilities are in a later cascade layer, `px-6` and `rounded-full` win
 over the component defaults without `!important`.
+
+## Custom components
+
+The registry is not limited to the classes listed above. Define your own
+components in `flexui.config.json` with base declarations, variants, parts,
+state selectors and `extends`, then use them as `fui-<name>` classes. A custom
+component can also replace a built-in of the same name.
+
+See [custom components](custom-components.md) for the configuration format, the
+generated class names, inheritance rules, validation and the Go registry API.

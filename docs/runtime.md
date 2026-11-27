@@ -1,12 +1,12 @@
 # Runtime
 
-`@flexui/runtime` is the optional zero-dependency browser runtime for FlexUI's
+`flexui-runtime` is the optional zero-dependency browser runtime for FlexUI's
 interactive components. The component CSS works without it; the runtime adds
 keyboard behaviour, focus management, ARIA state and events on top of native
 platform features.
 
 - No dependencies, no build step for consumers, ESM only.
-- Import the whole runtime or a single module (`@flexui/runtime/tabs`).
+- Import the whole runtime or a single module (`flexui-runtime/tabs`).
 - Progressive enhancement: dialogs use `<dialog>` + `showModal()`, popovers use
   the native popover API, and every controller has a fallback.
 - Strict TypeScript types are shipped with every module.
@@ -14,7 +14,7 @@ platform features.
 ## Install
 
 ```bash
-npm install @flexui/runtime
+npm install flexui-runtime
 ```
 
 Or copy `packages/runtime/dist` into your project. The runtime has no package
@@ -23,7 +23,7 @@ dependencies.
 ## Initialise
 
 ```ts
-import { init } from "@flexui/runtime";
+import { init } from "flexui-runtime";
 
 const dispose = init(); // scans document
 // later, if the page is a SPA view being torn down:
@@ -38,8 +38,8 @@ already bound is a no-op.
 You can also initialise individual features:
 
 ```ts
-import { initDialogs } from "@flexui/runtime/dialog";
-import { initTabs } from "@flexui/runtime/tabs";
+import { initDialogs } from "flexui-runtime/dialog";
+import { initTabs } from "flexui-runtime/tabs";
 ```
 
 ## Markup contracts
@@ -81,7 +81,7 @@ All triggers accept either an id (`#menu`) or an element reference.
 `bindDialog(element, options)` returns a controller:
 
 ```ts
-import { bindDialog } from "@flexui/runtime/dialog";
+import { bindDialog } from "flexui-runtime/dialog";
 
 const dialog = bindDialog(document.querySelector("#invite")!, {
   closeOnBackdrop: true, // default
@@ -154,7 +154,7 @@ orientation (`aria-orientation="vertical"`) are handled. Panels are linked with
 ## Toasts
 
 ```ts
-import { toast } from "@flexui/runtime/toast";
+import { toast } from "flexui-runtime/toast";
 
 const handle = toast({
   variant: "success", // "info" | "success" | "danger"
@@ -203,7 +203,7 @@ document.addEventListener("fui:command", (event) => {
 ## Theme switching
 
 ```ts
-import { getTheme, setTheme, toggleTheme, getResolvedTheme } from "@flexui/runtime/theme";
+import { getTheme, setTheme, toggleTheme, getResolvedTheme } from "flexui-runtime/theme";
 
 setTheme("dark");   // persists to localStorage by default
 setTheme("system", { persist: false });
@@ -221,7 +221,7 @@ reapplies the theme while the mode is `system`.
 ## Focus helpers
 
 ```ts
-import { focusable, focusFirst, trapFocus, FOCUSABLE_SELECTOR } from "@flexui/runtime/focus";
+import { focusable, focusFirst, trapFocus, FOCUSABLE_SELECTOR } from "flexui-runtime/focus";
 
 focusFirst(panel);          // autofocus, first focusable, or the container
 const release = trapFocus(panel); // Tab / Shift+Tab cycling

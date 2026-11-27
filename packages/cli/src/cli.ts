@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Bin entry point for `npx flexui`. */
+/** Bin entry point for the `flexui` command (package `flexui-compiler`). */
 
 import { runInherit } from "./index";
 

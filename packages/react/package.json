@@ -1,6 +1,6 @@
 {
-  "name": "@flexui/react",
-  "version": "2.0.0-alpha.1",
+  "name": "flexui-react",
+  "version": "2.0.0-alpha.2",
   "description": "React hooks for FlexUI interactive components",
   "license": "MIT",
   "type": "module",
@@ -14,14 +14,15 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@flexui/runtime": "2.0.0-alpha.1"
+    "flexui-runtime": "2.0.0-alpha.2"
   },
   "peerDependencies": {
     "react": "^19.3.1"

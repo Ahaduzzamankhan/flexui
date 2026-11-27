@@ -7,23 +7,81 @@ FlexUI scans your markup and scripts, resolves only the utilities you actually
 use and writes one deterministic, standards-compliant stylesheet. The compiler
 is a native binary; you never install Go to use it.
 
-- **Status:** 2.0.0-alpha.1. The compiler, component CSS layer and optional
-  zero-dependency runtime are implemented and tested. Integrations and
-  benchmarks remain - see [docs/roadmap.md](docs/roadmap.md).
+- **Status:** 2.0.0-alpha.2. The compiler, utilities, variants, theme and
+  animation engines, component layer (including user-defined components),
+  optional runtime, framework integrations, incremental builds, benchmarks and
+  release automation are implemented and tested. See
+  [docs/roadmap.md](docs/roadmap.md) for what remains.
+- **Version:** one source of truth in [`version.json`](version.json); tags,
+  binaries, npm packages and release notes all resolve it.
 - **License:** MIT
 
-## Install
+## Installation
+
+FlexUI installs with the Node.js toolchain you already have. The compiler is a
+native binary, so Go is not part of the setup.
+
+**Requirements:** Node.js 18 or newer, or Bun 1.1 or newer.
+
+### Add the compiler
 
 ```bash
-npm install flexui
+npm install --save-dev flexui-compiler
+```
+
+That installs the `flexui` command together with the binary for your machine —
+Windows, Linux or macOS, on x64 or ARM64. pnpm, Yarn and Bun resolve the same
+packages:
+
+```bash
+pnpm add -D flexui-compiler
+yarn add -D flexui-compiler
+bun add -d flexui-compiler
+```
+
+### Create a project
+
+```bash
 npx flexui init
+```
+
+`init` writes `flexui.config.json` and an entry stylesheet. Send the `content`
+globs at your source files, then compile:
+
+```bash
 npx flexui build
 ```
 
-The npm package ships precompiled binaries for Windows x64/ARM64, Linux
-x64/ARM64 and macOS x64/ARM64. If your platform package is missing, the wrapper
-reports exactly what it looked for and how to fix it; you can also point
-`FLEXUI_BINARY` at any `flexui` binary.
+The stylesheet is written to `dist/flexui.css` by default. While you work,
+`npx flexui watch` recompiles on every change.
+
+### Verify the install
+
+```bash
+npx flexui version
+npx flexui inspect
+```
+
+`version` prints the compiler version, and `inspect` lists the rules a build
+would emit — the quickest way to confirm the binary, the configuration and your
+content globs are all connected.
+
+### Framework setups
+
+- **Vite, React, Vue, Svelte** — install `flexui-vite` and add `flexui()` to
+  `vite.config.ts`. The plugin compiles when the dev server starts and before
+  every production build.
+- **Interactive components** — install `flexui-runtime`, plus `flexui-react`,
+  `flexui-vue` or `flexui-svelte` when you want framework bindings.
+
+### Updating
+
+```bash
+npm install --save-dev flexui-compiler@alpha
+```
+
+The `alpha` dist-tag follows the 2.0 line. Every release is described in
+[CHANGELOG.md](CHANGELOG.md).
 
 ## Use
 
@@ -38,7 +96,7 @@ reports exactly what it looked for and how to fix it; you can also point
 Then build:
 
 ```bash
-npx flexui build --minify
+npx flexui-compiler build --minify
 ```
 
 Output is plain CSS. No JavaScript is required for styling.
@@ -89,7 +147,26 @@ popovers, toasts and command palettes. Components use the same design tokens as
 utilities, and utilities always override them. Only the classes you actually use
 are emitted. See [docs/components.md](docs/components.md).
 
-**Runtime** - `@flexui/runtime` is an optional zero-dependency ESM package for
+**Custom components** - the component engine is open. Define components in
+`flexui.config.json` with base declarations, variants, parts, state selectors and
+`extends` (custom or built-in), and use them as `fui-<name>` classes. There is no
+cap on how many you define, they are validated at config load time, only the
+classes you use are emitted, and a custom component can replace a built-in. See
+[docs/custom-components.md](docs/custom-components.md).
+
+**Animation engine** - 25 built-in animations plus duration, delay, easing,
+iteration, direction, fill, play-state and composition controls, staggered
+children, view- and scroll-timeline utilities, configuration-defined keyframes,
+deduplicated `@keyframes` and a reduced-motion override.
+
+**Theme engine** - design tokens emitted as CSS custom properties with semantic
+roles, config overrides and `class`/`media`/`both` dark-mode strategies, so theme
+switching needs no rebuild.
+
+**Integrations** - `flexui-vite` for dev and build, `flexui-react` hooks,
+`flexui-vue` composables and `flexui-svelte` actions.
+
+**Runtime** - `flexui-runtime` is an optional zero-dependency ESM package for
 dialog, drawer, dropdown, popover, tabs, toast, command palette, focus
 management and theme switching. It progressively enhances native `<dialog>` and
 the popover API, restores focus, locks scroll, and emits DOM events. Import the
@@ -100,21 +177,31 @@ features, pricing, FAQ, footer) built entirely from FlexUI utilities.
 `examples/components` is an interactive component lab that exercises every
 runtime feature in one page.
 
-## Not implemented yet
+## Release and CI
 
-These are specified and deliberately not faked:
+`version.json` is the only version written by hand. `go run ./cmd/version`
+resolves it for Go builds, `scripts/version.ts` resolves it for npm scripts,
+tags and release notes, and release binaries get it injected with `-ldflags`.
 
-- Animation engine (staggered and scroll-driven animation) - Phase 5.
-- Vite/React/Vue/Svelte integrations - Phase 7.
-- Theme configuration overrides and CSS-variable token output - Phase 4.
-- Signal-based watch (current watch mode polls) and per-file incremental
-  compilation - Phase 8.
-- Published benchmarks against other frameworks - Phase 8. No performance claim
-  is made until measurements exist.
+```bash
+bun run version:check        # every package manifest matches version.json
+bun run release              # build binaries, stage assets, write notes
+bun run release:publish      # tag, push and create the GitHub release
+bun run publish:npm:dry-run  # verify publishable tarballs without publishing
+```
 
-Known limitation worth calling out: `filter` utilities (`blur-*`, `grayscale-*`)
-do not yet compose with each other, because each emits the `filter` property
-directly. Transforms *do* compose, through CSS custom properties.
+GitHub Actions runs formatting, vet, tests, typecheck and cross-compiled
+binaries on every push and pull request. Pushing a `v*` tag verifies the tag
+against `version.json`, builds every platform, attaches uniquely named binaries
+plus `checksums.json`/`SHA256SUMS`, and uses the matching `CHANGELOG.md` section
+as the release body. npm packages publish from that job when `NPM_TOKEN` is set.
+See [docs/releasing.md](docs/releasing.md).
+
+## Roadmap
+
+The next milestones — a generated documentation site, comparison benchmarks and
+filesystem-event watching — are tracked in [docs/roadmap.md](docs/roadmap.md).
+Release notes for every version live in [CHANGELOG.md](CHANGELOG.md).
 
 ## Repository layout
 
@@ -138,12 +225,17 @@ internal/
   components/          component CSS registry
 packages/
   cli/                 npm package "flexui" (TypeScript: resolver + API)
-  runtime/             npm package "@flexui/runtime" (TypeScript, ESM)
+  runtime/             npm package "flexui-runtime" (TypeScript, ESM)
+  react/ vue/ svelte/  framework helpers
+  vite-plugin/         npm package "flexui-vite"
   cli-<platform>/      optional platform packages with native binaries
 examples/basic/        marketing site example, compiled by FlexUI
 examples/components/   component and runtime lab
-scripts/               serve.ts preview server, build-binaries.sh
+scripts/               serve.ts, build-binaries.sh, version.ts, release.ts, publish.ts
 docs/                  documentation
+version.json           single version source
+CHANGELOG.md           release notes used by the release workflow
+.github/workflows/     CI and tag-driven release
 ```
 
 ## Development
@@ -185,7 +277,11 @@ bun scripts/serve.ts . 4173              # http://127.0.0.1:4173/examples/compon
 - [Getting started](docs/getting-started.md)
 - [CLI reference](docs/cli.md)
 - [Components](docs/components.md)
+- [Custom components](docs/custom-components.md)
 - [Runtime](docs/runtime.md)
+- [Integrations](docs/integrations.md)
+- [Benchmarks](docs/benchmarks.md)
+- [Releasing](docs/releasing.md)
 - [Utility reference](docs/utilities.md)
 - [Variants](docs/variants.md)
 - [Architecture](docs/architecture.md)

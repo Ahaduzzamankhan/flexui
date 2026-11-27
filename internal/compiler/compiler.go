@@ -16,6 +16,7 @@ import (
 	"github.com/Ahaduzzamankhan/flexui/internal/animation"
 	"github.com/Ahaduzzamankhan/flexui/internal/ast"
 	"github.com/Ahaduzzamankhan/flexui/internal/cache"
+	"github.com/Ahaduzzamankhan/flexui/internal/components"
 	"github.com/Ahaduzzamankhan/flexui/internal/config"
 	"github.com/Ahaduzzamankhan/flexui/internal/extractor"
 	"github.com/Ahaduzzamankhan/flexui/internal/generator"
@@ -31,7 +32,7 @@ import (
 // with -ldflags "-X .../internal/compiler.Version=<version>"; the default below
 // keeps `go run` and `go build` working, and TestVersionMatchesVersionFile fails
 // if the two ever drift apart.
-var Version = "2.0.0-alpha.1"
+var Version = "2.0.0-alpha.2"
 
 // Banner is the comment written at the top of generated stylesheets.
 var Banner = "FlexUI " + Version + " - generated stylesheet. Do not edit by hand."
@@ -228,11 +229,17 @@ func Build(opts Options) (Result, error) {
 	}
 	res.Stats.Candidates = len(candidates)
 
+	customs := customComponents(cfg.Components)
+	if err := components.ValidateCustom(customs); err != nil {
+		return res, fmt.Errorf("config: %w", err)
+	}
+
 	rules := resolver.NewWith(resolver.Options{
 		Theme:            theme,
 		DarkMode:         darkMode,
 		CustomVariants:   cfg.Variants,
 		CustomAnimations: customAnimations(cfg.Animations),
+		CustomComponents: customs,
 	})
 	names := make([]string, 0, len(candidates))
 	for name := range candidates {
@@ -354,6 +361,33 @@ func applyTheme(t *themes.Theme, cfg *config.ThemeConfig) {
 		}
 	}
 	t.Apply(o)
+}
+
+// customComponents converts configuration components into registry definitions
+// in sorted order, so registration and output are deterministic.
+func customComponents(cfg map[string]config.ComponentConfig) []components.CustomComponent {
+	if len(cfg) == 0 {
+		return nil
+	}
+	names := make([]string, 0, len(cfg))
+	for name := range cfg {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+
+	out := make([]components.CustomComponent, 0, len(names))
+	for _, name := range names {
+		c := cfg[name]
+		out = append(out, components.CustomComponent{
+			Name:     name,
+			Extends:  c.Extends,
+			Base:     c.Base,
+			Variants: c.Variants,
+			Parts:    c.Parts,
+			States:   c.States,
+		})
+	}
+	return out
 }
 
 // customAnimations converts configuration animations into definitions.

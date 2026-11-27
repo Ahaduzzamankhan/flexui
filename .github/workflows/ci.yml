@@ -64,8 +64,8 @@ jobs:
       - name: runtime and plugin tests
         run: bun test packages/runtime/test packages/vite-plugin/test
 
-  binaries:
-    name: Cross-compiled binaries
+  packages:
+    name: npm package contents
     needs: [go, typescript]
     runs-on: ubuntu-latest
     steps:
@@ -76,10 +76,43 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: build all platforms
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: install
+        run: bun install --frozen-lockfile
+
+      - name: every package documents itself
+        run: |
+          missing=0
+          for dir in packages/*/; do
+            if [ ! -f "${dir}README.md" ]; then
+              echo "::error file=${dir}package.json::${dir} has no README.md"
+              missing=1
+            fi
+          done
+          if [ ! -f packages/cli/README.md ]; then
+            echoing "flexui-compiler needs its README"
+            missing=1
+          fi
+          exit $missing
+
+      - name: build binaries and checksums
         run: bash scripts/build-binaries.sh
 
-      - name: verified binary reports the released version
+      - name: build TypeScript output
+        run: |
+          bun run build:js
+          bun run build:runtime
+          bun run build:integrations
+
+      - name: binaries report the version.json version
         run: |
           expected="$(go run ./cmd/version -field version)"
           actual="$(./packages/cli-linux-x64/flexui version)"
@@ -90,11 +123,5 @@ jobs:
             *) echo "binary version does not match version.json"; exit 1 ;;
           esac
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: flexui-binaries
-          if-no-files-found: error
-          path: |
-            packages/cli-*/flexui
-            packages/cli-*/flexui.exe
-            packages/cli/checksums.json
+      - name: tarballs are publishable
+        run: bun run publish:npm:dry-run

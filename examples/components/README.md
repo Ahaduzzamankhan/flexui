@@ -1,6 +1,6 @@
 # FlexUI component lab
 
-One page that exercises every feature of [`@flexui/runtime`](../../packages/runtime):
+One page that exercises every feature of [`flexui-runtime`](../../packages/runtime):
 native dialogs, an edge drawer, a dropdown menu, a positioned popover, ARIA tabs,
 toasts, a Ctrl/Cmd+K command palette and persistent light/dark/system theme
 switching.

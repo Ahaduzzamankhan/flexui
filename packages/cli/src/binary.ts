@@ -3,7 +3,7 @@
  *
  * Resolution order:
  *   1. `FLEXUI_BINARY` (explicit override used by CI and by release checks).
- *   2. The optional platform package (`@flexui/cli-<platform>-<arch>`), which
+ *   2. The optional platform package (`flexui-cli-<platform>-<arch>`), which
  *      npm installs as a normal dependency. No install script is involved, so
  *      it also works when lifecycle scripts are disabled.
  *   3. A vendored copy inside this package (`binaries/<platform>-<arch>/`),
@@ -20,12 +20,12 @@ export interface PlatformInfo {
 }
 
 export const PLATFORMS: Readonly<Record<string, PlatformInfo>> = {
-  "win32-x64": { pkg: "@flexui/cli-win32-x64", binary: "flexui.exe" },
-  "win32-arm64": { pkg: "@flexui/cli-win32-arm64", binary: "flexui.exe" },
-  "linux-x64": { pkg: "@flexui/cli-linux-x64", binary: "flexui" },
-  "linux-arm64": { pkg: "@flexui/cli-linux-arm64", binary: "flexui" },
-  "darwin-x64": { pkg: "@flexui/cli-darwin-x64", binary: "flexui" },
-  "darwin-arm64": { pkg: "@flexui/cli-darwin-arm64", binary: "flexui" },
+  "win32-x64": { pkg: "flexui-cli-windows-x64", binary: "flexui.exe" },
+  "win32-arm64": { pkg: "flexui-cli-windows-arm64", binary: "flexui.exe" },
+  "linux-x64": { pkg: "flexui-cli-linux-x64", binary: "flexui" },
+  "linux-arm64": { pkg: "flexui-cli-linux-arm64", binary: "flexui" },
+  "darwin-x64": { pkg: "flexui-cli-darwin-x64", binary: "flexui" },
+  "darwin-arm64": { pkg: "flexui-cli-darwin-arm64", binary: "flexui" },
 };
 
 export interface ChecksumEntry {
