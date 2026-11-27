@@ -7,7 +7,7 @@ FlexUI scans your markup and scripts, resolves only the utilities you actually
 use and writes one deterministic, standards-compliant stylesheet. The compiler
 is a native binary; you never install Go to use it.
 
-- **Status:** 2.0.0-alpha.2. The compiler, utilities, variants, theme and
+- **Status:** 2.0.1. The compiler, utilities, variants, theme and
   animation engines, component layer (including user-defined components),
   optional runtime, framework integrations, incremental builds, benchmarks and
   release automation are implemented and tested. See
@@ -41,12 +41,18 @@ yarn add -D flexui-v2
 bun add -d flexui-v2
 ```
 
-When you only want the compiler inside one project, `flexui-compiler` is the
-same thing without the umbrella package:
+That single package brings in everything:
 
-```bash
-npm install --save-dev flexui-compiler
-```
+| Package | What it provides |
+| --- | --- |
+| `flexui-v2` | the installer itself and the `flexui` launcher |
+| `flexui-compiler` | the compiler CLI and its TypeScript API |
+| `flexui-cli-<platform>` | the native binary for your OS and CPU |
+
+On a project install the command is `npx flexui`; after a global install it is
+plain `flexui`. Installing the compiler directly
+(`npm install --save-dev flexui-compiler`) works too when you want the smaller
+package without the umbrella.
 
 ### Create a project
 
@@ -88,10 +94,11 @@ content globs are all connected.
 ### Updating
 
 ```bash
-npm install --save-dev flexui-compiler@alpha
+npm install --save-dev flexui-v2@latest
 ```
 
-The `alpha` dist-tag follows the 2.0 line. Every release is described in
+`latest` is the stable line. Prereleases are published under the `alpha`
+dist-tag (`npm install flexui-v2@alpha`), and every version is described in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Use
@@ -107,7 +114,7 @@ The `alpha` dist-tag follows the 2.0 line. Every release is described in
 Then build:
 
 ```bash
-npx flexui-compiler build --minify
+npx flexui build --minify
 ```
 
 Output is plain CSS. No JavaScript is required for styling.
@@ -235,7 +242,8 @@ internal/
   cli/                 command line interface
   components/          component CSS registry
 packages/
-  cli/                 npm package "flexui" (TypeScript: resolver + API)
+  cli/                 npm package "flexui-compiler" (resolver, CLI, TypeScript API)
+  installer/           npm package "flexui-v2" (one-command install + `flexui` bin)
   runtime/             npm package "flexui-runtime" (TypeScript, ESM)
   react/ vue/ svelte/  framework helpers
   vite-plugin/         npm package "flexui-vite"
